@@ -23,7 +23,9 @@ if($IMAP->Box == null){
   if(!is_dir($store)){mkdir($store);}
   $store .= $settings['imap']['username'].'/';
   if(!is_dir($store)){mkdir($store);}
+  echo "Opening Mailbox ".$settings['imap']['username']."<br>\n";
   if($IMAP->NewMSG != null){
+    echo "Reading Mailbox ".$settings['imap']['username']."<br>\n";
     foreach($IMAP->NewMSG as $msg){
       echo "Looking at message[".$msg->ID."]".$msg->Subject->PLAIN."<br>\n";
       $files = [];
