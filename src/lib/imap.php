@@ -53,32 +53,34 @@ class apiIMAP{
 					$msg->Body->Unquoted = str_replace("<html>","",str_replace("</html>","",str_replace("<body>","",str_replace("</body>","",$msg->Body->Unquoted->saveHtml()))));
 					$msg->Attachments = new stdClass();
 					$msg->Attachments->Files = [];
-					$msg->Attachments->Count = count($msg->Body->Meta->parts);
-					foreach($msg->Body->Meta->parts as $key => $part){
-						if($part->ifdparameters){
-							foreach($part->dparameters as $object){
-								if(strtolower($object->attribute) == 'filename'){
-									$msg->Attachments->Files[$key]['filename'] = $object->value;
-									$msg->Attachments->Files[$key]['is_attachment'] = true;
+					if(is_array($msg->Body->Meta->parts)){
+						$msg->Attachments->Count = count($msg->Body->Meta->parts);
+						foreach($msg->Body->Meta->parts as $key => $part){
+							if($part->ifdparameters){
+								foreach($part->dparameters as $object){
+									if(strtolower($object->attribute) == 'filename'){
+										$msg->Attachments->Files[$key]['filename'] = $object->value;
+										$msg->Attachments->Files[$key]['is_attachment'] = true;
+									}
 								}
 							}
-						}
-						if($part->ifparameters){
-							foreach($part->parameters as $object){
-								if(strtolower($object->attribute) == 'name'){
-									$msg->Attachments->Files[$key]['name'] = $object->value;
-									$msg->Attachments->Files[$key]['is_attachment'] = true;
+							if($part->ifparameters){
+								foreach($part->parameters as $object){
+									if(strtolower($object->attribute) == 'name'){
+										$msg->Attachments->Files[$key]['name'] = $object->value;
+										$msg->Attachments->Files[$key]['is_attachment'] = true;
+									}
 								}
 							}
-						}
-						if((isset($msg->Attachments->Files[$key]))&&($msg->Attachments->Files[$key]['is_attachment'])){
-							$msg->Attachments->Files[$key]['attachment'] = imap_fetchbody($this->Box,$msgid, $key+1);
-							$msg->Attachments->Files[$key]['encoding'] = $part->encoding;
-              if($part->encoding == 3){
-                $msg->Attachments->Files[$key]['attachment'] = base64_decode($msg->Attachments->Files[$key]['attachment']);
-              } elseif($part->encoding == 4){
-                $msg->Attachments->Files[$key]['attachment'] = quoted_printable_decode($msg->Attachments->Files[$key]['attachment']);
-              }
+							if((isset($msg->Attachments->Files[$key]))&&($msg->Attachments->Files[$key]['is_attachment'])){
+								$msg->Attachments->Files[$key]['attachment'] = imap_fetchbody($this->Box,$msgid, $key+1);
+								$msg->Attachments->Files[$key]['encoding'] = $part->encoding;
+	              if($part->encoding == 3){
+	                $msg->Attachments->Files[$key]['attachment'] = base64_decode($msg->Attachments->Files[$key]['attachment']);
+	              } elseif($part->encoding == 4){
+	                $msg->Attachments->Files[$key]['attachment'] = quoted_printable_decode($msg->Attachments->Files[$key]['attachment']);
+	              }
+							}
 						}
 					}
 					imap_clearflag_full($this->Box, $msgid, "\\Seen");
