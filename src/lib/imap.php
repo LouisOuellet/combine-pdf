@@ -22,7 +22,6 @@ class apiIMAP{
 			$this->Meta = imap_check($this->Box);
 			if(imap_search($this->Box, 'UNSEEN')){
 				$NewMSGs = imap_search($this->Box, 'UNSEEN');
-				var_dump($NewMSGs);
 				$this->Meta->Recent = count($NewMSGs);
 				$this->NewMSG = [];
 				foreach($NewMSGs as $msgid){
