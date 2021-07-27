@@ -1,0 +1,8 @@
+#!/bin/bash
+
+while(true);do
+  php /opt/combine-pdf/combine.php
+  rm -r /opt/combine-pdf/tmp
+done
+
+exit 0

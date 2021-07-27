@@ -1,0 +1,36 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          combine-pdf
+# Required-Start:    $all
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:
+# Short-Description: Merging PDF documents
+### END INIT INFO
+
+case "$1" in
+start)
+   /opt/combine-pdf/service &
+   echo $!>/var/run/service.pid
+   ;;
+stop)
+   kill `cat /var/run/service.pid`
+   rm /var/run/service.pid
+   ;;
+restart)
+   $0 stop
+   $0 start
+   ;;
+status)
+   if [ -e /var/run/service.pid ]; then
+      echo service.sh is running, pid=`cat /var/run/service.pid`
+   else
+      echo service.sh is NOT running
+      exit 1
+   fi
+   ;;
+*)
+   echo "Usage: $0 {start|stop|status|restart}"
+esac
+
+exit 0
