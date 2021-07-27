@@ -12,7 +12,7 @@ PHP application to combine multiple PDF files into one
 ```BASH
 cd /opt/
 sudo git clone https://github.com/LouisOuellet/combine-pdf.git
-sudo ln -s /opt/combine-excel/init /etc/init.d/combine-pdf
+sudo ln -s /opt/combine-pdf/init /etc/init.d/combine-pdf
 sudo systemctl daemon-reload
 sudo systemctl enable combine-pdf
 sudo systemctl start combine-pdf
