@@ -73,5 +73,4 @@ nano settings.json
         "password": "password"
     }
 }
-
 ```
