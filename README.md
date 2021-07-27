@@ -60,10 +60,6 @@ nano settings.json
         "isSelfSigned": true,
         "username": "username@domain.com",
         "password": "password"
-    },
-    "send":{
-        "name": "Processing",
-        "from": "username@domain.com"
     }
 }
 

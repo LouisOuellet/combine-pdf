@@ -47,7 +47,7 @@ if($IMAP->Box == null){
       // Send Mail to Contact
 
       $SMTP->send($msg->From, "Excel(s) merged successfully!", [
-        'from' => "noreply@albcie.com",
+        'from' => $settings['smtp']['username'],
         'subject' => $msg->Subject->PLAIN,
         'attachments' => [$mergedfile],
       ]);
