@@ -2,7 +2,9 @@
 
 while(true);do
   php /opt/combine-pdf/combine.php
-  rm -r /opt/combine-pdf/tmp
+  if [ -f "/opt/combine-pdf/tmp" ]; then
+    rm -r /opt/combine-pdf/tmp
+  fi
 done
 
 exit 0
