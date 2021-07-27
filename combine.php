@@ -42,15 +42,25 @@ if($IMAP->Box == null){
         }
       }
       // Merge Files
-      $mergedfile = $PDF->combine($files,$store.$msg->UID.'/');
-      echo "Merging into ".$mergedfile."<br>\n";
-      // Send Mail to Contact
-
-      $SMTP->send($msg->From, "Excel(s) merged successfully!", [
-        'from' => $settings['smtp']['username'],
-        'subject' => $msg->Subject->PLAIN,
-        'attachments' => [$mergedfile],
-      ]);
+      if(!empty($files)){
+        $mergedfile = $PDF->combine($files,$store.$msg->UID.'/');
+        echo "Merging into ".$mergedfile."<br>\n";
+        $message = "File(s) merged successfully!";
+        // Send Mail to Contact
+        $SMTP->send($msg->From, $message, [
+          'from' => $settings['smtp']['username'],
+          'subject' => $msg->Subject->PLAIN,
+          'attachments' => [$mergedfile],
+        ]);
+      } else {
+        echo "No File Found!<br>\n";
+        $message = "No File Found!";
+        // Send Mail to Contact
+        $SMTP->send($msg->From, $message, [
+          'from' => $settings['smtp']['username'],
+          'subject' => $msg->Subject->PLAIN,
+        ]);
+      }
       echo "Sending email to ".$msg->From."<br>\n";
       // Set Mail Status to Read
       echo "Setting email ".$msg->UID." as read<br>\n";
