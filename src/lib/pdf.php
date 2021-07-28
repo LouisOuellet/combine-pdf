@@ -49,8 +49,10 @@ class apiPDF{
 
 		// Start Merging
 		foreach($files as $file){
-			if($this->version($file) != '1.14'){ $this->convert($file); }
-			$pdf->addPDF($file, 'all');
+			if(strpos(strtolower($file), '.pdf') !== false){
+				if($this->version($file) != '1.14'){ $this->convert($file); }
+				$pdf->addPDF($file, 'all');
+			}
 		}
 
 		// Generate Name
