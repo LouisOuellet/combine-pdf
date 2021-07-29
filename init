@@ -23,9 +23,9 @@ restart)
    ;;
 status)
    if [ -e /var/run/service.pid ]; then
-      echo service.sh is running, pid=`cat /var/run/service.pid`
+      echo service is running, pid=`cat /var/run/service.pid`
    else
-      echo service.sh is NOT running
+      echo service is NOT running
       exit 1
    fi
    ;;
