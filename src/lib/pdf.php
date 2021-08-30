@@ -142,53 +142,26 @@ class apiPDF{
 			// Convert to PNG
 			for ($page = 0; $page <= $this->getNbrPages($file)-1; $page++) {
 				$png = new Imagick();
-				$png->readimage($file."[".$page."]");
+				if(!$pdf->readImage($file."[".$page."]")){ $this->errors[] =  "Unable to read ".$file."[".$page."]"; }
 				$png->setImageFormat("png");
 				$png->setImageColorSpace($colorspace);
 				$png->setImageDepth(8);
-				$png->writeImage(str_replace('.pdf','-'.$page.'.png',$file));
-				$images[] = str_replace('.pdf','-'.$page.'.png',$file);
+				$filename = str_replace('.pdf','-'.$page.'.png',$file);
+				if(!$png->writeImage($filename)){ $this->errors[] =  "Unable to write ".$filename; }
+				$images[] = $filename;
 			}
 		} else { $this->errors[] =  $file." is not a PDF file"; }
 		if(!count($this->errors)){ return $images; } else { return false; }
 	}
 
-	protected function png2pdf($file){
-		$pdf = new Imagick();
-		$pdf->readImage($file);
-		$pdf->setFormat('pdf');
-		$png->writeImage(str_replace('.png','.pdf',$file));
-	}
-
-	protected function tiff2pdf($file_tif, $file_pdf){
-	  // Initialize
-	  $cmd_ps2pdf = "/usr/bin/ps2pdfwr";
-	  // Initial Error handling
-	  if (!file_exists($file_tif)) $this->errors[] = "Original TIFF file:".$file_tif." does not exist";
-	  if (!file_exists($cmd_ps2pdf)) $this->errors[] = "Ghostscript PostScript to PDF converter not found at: ".$cmd_ps2pdf;
-	  if (!extension_loaded("imagick")) $this->errors[] = "Imagick extension not installed or not loaded";
-	  // Only continue if there aren't any errors
-	  if (!count($this->errors)) {
-      // Determine the file base
-      $base = $file_pdf;
-      if(($ext = strrchr($file_pdf, '.')) !== false) $base = substr($file_pdf, 0, -strlen($ext));
-      // Determine the temporary .ps filepath
-      $file_ps = $base.".ps";
-      // Open the original .tiff
-      $document = new Imagick($file_tif);
-      // Use Imagick to write multiple pages to 1 .ps file
-      if (!$document->writeImages($file_ps, true)) {
-        $this->errors[] = "Unable to use Imagick to write multiple pages to 1  .ps file: ".$file_ps;
-      } else {
-        $document->clear();
-        // Use ghostscript to convert .ps -> .pdf
-        exec($cmd_ps2pdf." -sPAPERSIZE=a4 ".$file_ps." ".$file_pdf, $o, $r);
-        if ($r) {
-          $this->errors[] = "Unable to use ghostscript to convert .ps(".$file_ps.") -> .pdf(".$file_pdf."). Check rights. ";
-        }
-      }
-	  }
-	  // return array with errors, or true with success.
+	public function png2pdf($file){
+		if(strpos(strtolower($file), '.png') !== false){
+			$pdf = new Imagick();
+			if(!$pdf->readImage($file)){ $this->errors[] =  "Unable to read ".$file; }
+			$pdf->setFormat('pdf');
+			$filename = str_replace('.png','.pdf',$file);
+			if(!$png->writeImage($filename)){ $this->errors[] =  "Unable to write ".$filename; }
+		} else { $this->errors[] =  $file." is not a PNG file"; }
 		if(!count($this->errors)){ return true; } else { return false; }
 	}
 }
