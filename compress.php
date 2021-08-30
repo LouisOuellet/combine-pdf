@@ -15,7 +15,5 @@ foreach($images as $image){
   if(!$PDF->png2pdff($image)){ print_r($PDF->errors); }
   $pdfs[] = str_replace('.png','.pdf',$image);
 }
-print_r($images);
-print_r($pdfs);
-// $pdf = $PDF->combine($pdfs);
+$pdf = $PDF->combine($pdfs);
 if(count($PDF->errors)){ print_r($PDF->errors); } else { print_r($pdf); }
