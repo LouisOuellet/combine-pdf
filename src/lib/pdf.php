@@ -69,6 +69,22 @@ class apiPDF{
 		if(!count($this->errors)){ return true; } else { return false; }
 	}
 
+	// OCR
+
+	public function OCR($file){
+		$ocr = new TesseractOCR();
+		$ocr->image($file);
+		$timeout = 500;
+		return $ocr->run($timeout);
+	}
+
+	// Helpers
+
+	protected function getNbrPages($file){
+		$document = new Imagick($file);
+		return $document->getNumberImages();
+	}
+
 	// Compressions
 
 	protected function resizeTiff($file, $size = 10000000){
@@ -102,13 +118,39 @@ class apiPDF{
 
 	protected function pdf2tiff($file){
 		if(strpos(strtolower($file), '.pdf') !== false){
+			// Initialize
+			$colorspace = imagick::COLORSPACE_CMYK;
 			// Convert to TIFF
-			$tiff = new Imagick($file);
-			$tiff->setImageFormat("tiff");
-			$tiff->setImageColorSpace(5);
-			$tiff->writeImage(str_replace('.pdf','.tiff',$file));
+			for ($page = 0; $page <= $this->getNbrPages($file); $page++) {
+				$tiff = new Imagick();
+				$tiff->readimage($file."[".$page."]");
+				$tiff->setImageFormat("tiff");
+				$tiff->setImageColorSpace($colorspace);
+				$tiff->setImageDepth(8);
+				$tiff->writeImage(str_replace('.pdf','-'.$page.'.tiff',$file));
+				$images[] = str_replace('.pdf','-'.$page.'.tiff',$file);
+			}
 		} else { $this->errors[] =  $file." is not a PDF file"; }
-		if(!count($this->errors)){ return true; } else { return false; }
+		if(!count($this->errors)){ return $images; } else { return false; }
+	}
+
+	public function pdf2png($file){
+		if(strpos(strtolower($file), '.pdf') !== false){
+			// Initialize
+			$colorspace = imagick::COLORSPACE_CMYK;
+			$images = [];
+			// Convert to PNG
+			for ($page = 0; $page <= $this->getNbrPages($file); $page++) {
+				$png = new Imagick();
+				$png->readimage($file."[".$page."]");
+				$png->setImageFormat("png");
+				$png->setImageColorSpace($colorspace);
+				$png->setImageDepth(8);
+				$png->writeImage(str_replace('.pdf','-'.$page.'.png',$file));
+				$images[] = str_replace('.pdf','-'.$page.'.png',$file);
+			}
+		} else { $this->errors[] =  $file." is not a PDF file"; }
+		if(!count($this->errors)){ return $images; } else { return false; }
 	}
 
 	protected function tiff2pdf($file_tif, $file_pdf){
