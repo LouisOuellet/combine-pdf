@@ -37,7 +37,7 @@ class apiPDF{
 		return $guesser->guess($file);
 	}
 
-	public function combine($files,$destDIR, $filename = null){
+	public function combine($files,$destDIR = 'tmp/', $filename = null){
 		// Create Merger Instance
 		$pdf = new \Jurosh\PDFMerge\PDFMerger;
 		// Start Merging

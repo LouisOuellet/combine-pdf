@@ -9,8 +9,10 @@ $PDF = new apiPDF();
 $file = dirname(__FILE__) . '/tmp/test.pdf';
 $size = 10000000; //10mb
 
-if(!$images = $PDF->pdf2png($file)){ print_r($PDF->errors); }
-foreach($images as $image){
-  if(!$PDF->png2pdf($file)){ print_r($PDF->errors); }
+$pdfs = [];
+foreach($PDF->pdf2png($file) as $image){
+  if(!$PDF->png2pdf($image)){ print_r($PDF->errors); }
+  $pdfs[] = str_replace('.png','.pdf',$image);
 }
-// if(!$PDF->compress($file,$size)){ print_r($PDF->errors); }
+$pdf = $PDF->combine($pdfs);
+if(count($PDF->errors)){ print_r($PDF->errors); } else { print_r($pdf); }
