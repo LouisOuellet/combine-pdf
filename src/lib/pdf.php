@@ -41,7 +41,7 @@ class apiPDF {
 
 	public function version($file){
 		$guesser = new RegexGuesser();
-		return $guesser->guess($file);
+		return floatval($guesser->guess($file));
 	}
 
 	public function combine($files,$destDIR = 'tmp/', $filename = null){
@@ -50,8 +50,7 @@ class apiPDF {
 		// Start Merging
 		foreach($files as $file){
 			if(strpos(strtolower($file), '.pdf') !== false){
-				echo $this->version($file)."\n";
-				if($this->version($file) > '1.14'){ $this->pdf2114($file); }
+				if($this->version($file) > 1.14){ echo "Converting: ".$file;$this->pdf2114($file); }
 				$pdf->addPDF($file, 'all');
 			}
 		}
