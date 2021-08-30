@@ -55,8 +55,6 @@ class apiPDF{
 	}
 
 	public function compress($file, $size = 10000000){
-		// Initialize
-		$file = escapeshellarg($file);
 		if(strpos(strtolower($file), '.pdf') !== false){
 			// Get Filename
 			$filename = str_replace('.pdf','',$file);
@@ -72,8 +70,6 @@ class apiPDF{
 	// Compressions
 
 	protected function resizeTiff($file, $size = 10000000){
-		// Initialize
-		$file = escapeshellarg($file);
 		if(strpos(strtolower($file), '.tiff') !== false){
 			$tiff = new Imagick($file);
 			// Setting your default compression
@@ -101,8 +97,6 @@ class apiPDF{
 	}
 
 	protected function pdf2tiff($file){
-		// Initialize
-		$file = escapeshellarg($file);
 		if(strpos(strtolower($file), '.pdf') !== false){
 			// Convert to TIFF
 			$tiff = new Imagick($file);
