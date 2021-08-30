@@ -26,7 +26,7 @@ use Xthiago\PDFVersionConverter\Guesser\RegexGuesser;
 use Xthiago\PDFVersionConverter\Converter\GhostscriptConverterCommand;
 use Xthiago\PDFVersionConverter\Converter\GhostscriptConverter;
 
-class apiPDF extends FPDF{
+class apiPDF {
 
 	const DPI = 96;
   const MM_IN_INCH = 25.4;
@@ -105,25 +105,6 @@ class apiPDF extends FPDF{
       round($this->pixelsToMM($scale * $width)),
       round($this->pixelsToMM($scale * $height))
 	  );
-  }
-
-  function centerImage($file, $orientation = 'P') {
-    list($width, $height) = $this->resizeToFit($file);
-		if($orientation == 'P'){
-			$this->Image(
-	      $file, (self::LETTER_WIDTH - $width) / 2,
-	      (self::LETTER_HEIGHT - $height) / 2,
-	      $width,
-	      $height
-	    );
-		} elseif($orientation == 'L'){
-			$this->Image(
-	      $file, (self::LETTER_HEIGHT - $width) / 2,
-	      (self::LETTER_WIDTH - $height) / 2,
-	      $width,
-	      $height
-	    );
-    }
   }
 
 	// Compressions
