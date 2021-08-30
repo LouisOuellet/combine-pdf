@@ -10,9 +10,12 @@ $file = dirname(__FILE__) . '/tmp/test.pdf';
 $size = 10000000; //10mb
 
 $pdfs = [];
-foreach($PDF->pdf2png($file) as $image){
+$images = $PDF->pdf2png($file)
+foreach($images as $image){
   if(!$PDF->png2pdff($image)){ print_r($PDF->errors); }
   $pdfs[] = str_replace('.png','.pdf',$image);
 }
-$pdf = $PDF->combine($pdfs);
+print_r($images);
+print_r($pdfs);
+// $pdf = $PDF->combine($pdfs);
 if(count($PDF->errors)){ print_r($PDF->errors); } else { print_r($pdf); }
