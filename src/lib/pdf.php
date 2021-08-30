@@ -140,7 +140,7 @@ class apiPDF{
 				$png->setResolution(300,300);
 				if(!$png->readImage($file."[".$page."]")){ $this->errors[] =  "Unable to read ".$file."[".$page."]"; }
 				$png->setImageFormat("png");
-				$png->setImageDepth(8);
+				$png->setImageDepth(32);
 				$filename = str_replace('.pdf','-'.$page.'.png',$file);
 				if(!$png->writeImage($filename)){ $this->errors[] =  "Unable to write ".$filename; }
 				$images[] = $filename;
