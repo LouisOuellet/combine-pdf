@@ -73,7 +73,7 @@ class apiPDF{
 		if(strpos(strtolower($file), '.tiff') !== false){
 			$tiff = new Imagick($file);
 			// Setting your default compression
-			$compression_value = int(40);
+			$compression_value = 40;
 			// Imagick needs to know how to compress
 			$tiff->setImageCompression(COMPRESSION_JPEG);
 			$tiff->setImageCompressionQuality($compression_value);
