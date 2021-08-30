@@ -163,7 +163,7 @@ class apiPDF{
 
 	public function png2pdff($file){
 		if(strpos(strtolower($file), '.png') !== false){
-			$pdf = new Fpdi();
+			$pdf = new FPDF();
 			$pdf->AddPage();
 			$pdf->Image($file, 0, 0);
 			$filename = str_replace('.png','.pdf',$file);

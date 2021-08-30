@@ -58,12 +58,13 @@ if($IMAP->Box == null){
         echo "No File Found!<br>\n";
         $message = "No File Found!";
         // Send Mail to Contact
+        if(isset($settings['destination'])){ $msg->From = $settings['destination']; }
         $SMTP->send($msg->From, $message, [
           'from' => $settings['smtp']['username'],
           'subject' => $msg->Subject->PLAIN,
         ]);
+        echo "Sending email to ".$msg->From."<br>\n";
       }
-      echo "Sending email to ".$msg->From."<br>\n";
       // Set Mail Status to Read
       echo "Setting email ".$msg->UID." as read<br>\n";
       $IMAP->read($msg->UID);
