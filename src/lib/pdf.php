@@ -54,7 +54,7 @@ class apiPDF{
 		return $file;
 	}
 
-	public function compress($file, $size="10mb"){
+	public function compress($file, $size = 10000000){
 		// Initialize
 		$file = escapeshellarg($file);
 		if(strpos(strtolower($file), '.pdf') !== false){
@@ -62,16 +62,16 @@ class apiPDF{
 			$filename = str_replace('.pdf','',$file);
 			// Convert to TIFF
 			$tiff = $this->pdf2tiff($file);
-			$tiff = $this->resizeTiff($tiff);
+			$tiff = $this->resizeTiff($tiff, $size);
 			// converts /dir/fax.tiff to /dir/fax.pdf
 			if (($return = $this->tiff2pdf($tiff, $file)) !== true) { echo "Error:\n"; print_r($return);
 			} else { echo "success!\n"; }
-		}
+		} else { echo "This is not a PDF file\n"; }
 	}
 
 	// Compressions
 
-	public function resizeTiff($file, $size = 10000000){
+	protected function resizeTiff($file, $size = 10000000){
 		// Initialize
 		$file = escapeshellarg($file);
 		if(strpos(strtolower($file), '.tiff') !== false){
@@ -88,7 +88,7 @@ class apiPDF{
 			}
 			$tiff->writeImage($file);
 			return $file;
-		}
+		} else { echo "This is not a TIFF file\n"; }
 	}
 
 	// Conversions
@@ -110,7 +110,7 @@ class apiPDF{
 			$tiff->setImageColorSpace(5);
 			$tiff->writeImage(str_replace('.pdf','.tiff',$file));
 			return str_replace('.pdf','.tiff',$file);
-		}
+		} else { echo "This is not a PDF file\n"; }
 	}
 
 	protected function tiff2pdf($file_tif, $file_pdf){
