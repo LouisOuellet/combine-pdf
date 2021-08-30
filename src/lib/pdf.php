@@ -26,7 +26,14 @@ use Xthiago\PDFVersionConverter\Guesser\RegexGuesser;
 use Xthiago\PDFVersionConverter\Converter\GhostscriptConverterCommand;
 use Xthiago\PDFVersionConverter\Converter\GhostscriptConverter;
 
-class apiPDF{
+class apiPDF extends FPDF{
+
+	const DPI = 96;
+  const MM_IN_INCH = 25.4;
+  const LETTER_HEIGHT = 279.4;
+  const LETTER_WIDTH = 215.9;
+  const MAX_WIDTH = 800;
+  const MAX_HEIGHT = 500;
 
 	public $errors = [];
 
@@ -84,6 +91,40 @@ class apiPDF{
 		$document = new Imagick($file);
 		return $document->getNumberImages();
 	}
+
+  protected function pixelsToMM($val) {
+    return $val * self::MM_IN_INCH / self::DPI;
+  }
+
+  protected function resizeToFit($imgFilename) {
+	  list($width, $height) = getimagesize($imgFilename);
+	  $widthScale = self::MAX_WIDTH / $width;
+	  $heightScale = self::MAX_HEIGHT / $height;
+	  $scale = min($widthScale, $heightScale);
+	  return array(
+      round($this->pixelsToMM($scale * $width)),
+      round($this->pixelsToMM($scale * $height))
+	  );
+  }
+
+  function centerImage($file, $orientation = 'P') {
+    list($width, $height) = $this->resizeToFit($file);
+		if($orientation == 'P'){
+			$this->Image(
+	      $file, (self::LETTER_WIDTH - $width) / 2,
+	      (self::LETTER_HEIGHT - $height) / 2,
+	      $width,
+	      $height
+	    );
+		} elseif($orientation == 'L'){
+			$this->Image(
+	      $file, (self::LETTER_HEIGHT - $width) / 2,
+	      (self::LETTER_WIDTH - $height) / 2,
+	      $width,
+	      $height
+	    );
+    }
+  }
 
 	// Compressions
 
@@ -163,9 +204,26 @@ class apiPDF{
 
 	public function png2pdff($file){
 		if(strpos(strtolower($file), '.png') !== false){
+			list($width, $height) = $this->resizeToFit($file);
 			$pdf = new FPDF();
-			$pdf->AddPage();
-			$pdf->Image($file, 0, 0);
+			if(imagesy($file) >= imagesx($file)){
+				$pdf->AddPage('P',"Letter");
+				$this->Image(
+		      $file, (self::LETTER_WIDTH - $width) / 2,
+		      (self::LETTER_HEIGHT - $height) / 2,
+		      $width,
+		      $height
+		    );
+			} else {
+				$pdf->AddPage('L',"Letter");
+				$this->Image(
+		      $file, (self::LETTER_HEIGHT - $width) / 2,
+		      (self::LETTER_WIDTH - $height) / 2,
+		      $width,
+		      $height
+		    );
+			}
+			// $pdf->Image($file, 0, 0);
 			$filename = str_replace('.png','.pdf',$file);
 			$pdf->Output('F', $filename, true);
 		} else { $this->errors[] =  $file." is not a PNG file"; }
