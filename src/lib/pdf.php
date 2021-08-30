@@ -197,7 +197,7 @@ class apiPDF {
 		    );
 			} else {
 				$pdf->AddPage('L',"Letter");
-				$this->Image(
+				$pdf->Image(
 		      $file, (self::LETTER_HEIGHT - $width) / 2,
 		      (self::LETTER_WIDTH - $height) / 2,
 		      $width,
