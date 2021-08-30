@@ -140,7 +140,7 @@ class apiPDF{
 				$png->setResolution(300,300);
 				if(!$png->readImage($file."[".$page."]")){ $this->errors[] =  "Unable to read ".$file."[".$page."]"; }
 				$png->setImageFormat("png");
-				$png->setImageDepth(32);
+				$png->setImageDepth(32); // TesseractOCR 8
 				$filename = str_replace('.pdf','-'.$page.'.png',$file);
 				if(!$png->writeImage($filename)){ $this->errors[] =  "Unable to write ".$filename; }
 				$images[] = $filename;
@@ -157,6 +157,17 @@ class apiPDF{
 			$pdf->setFormat('pdf');
 			$filename = str_replace('.png','.pdf',$file);
 			if(!$pdf->writeImage($filename)){ $this->errors[] =  "Unable to write ".$filename; }
+		} else { $this->errors[] =  $file." is not a PNG file"; }
+		if(!count($this->errors)){ return true; } else { return false; }
+	}
+
+	public function png2pdff($file){
+		if(strpos(strtolower($file), '.png') !== false){
+			$pdf = new Fpdi();
+			$pdf->AddPage();
+			$pdf->Image($file, 0, 0);
+			$filename = str_replace('.png','.pdf',$file);
+			$pdf->Output('F', $filename, true);
 		} else { $this->errors[] =  $file." is not a PNG file"; }
 		if(!count($this->errors)){ return true; } else { return false; }
 	}
