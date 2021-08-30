@@ -125,7 +125,7 @@ class apiPDF{
 				$tiff = new Imagick();
 				$tiff->readimage($file."[".$page."]");
 				$tiff->setImageFormat("tiff");
-				$tiff->setImageColorSpace($colorspace);
+				// $tiff->setImageColorSpace($colorspace);
 				$tiff->setImageDepth(8);
 				$tiff->writeImage(str_replace('.pdf','-'.$page.'.tiff',$file));
 				$images[] = str_replace('.pdf','-'.$page.'.tiff',$file);
@@ -144,7 +144,7 @@ class apiPDF{
 				$png = new Imagick();
 				if(!$png->readImage($file."[".$page."]")){ $this->errors[] =  "Unable to read ".$file."[".$page."]"; }
 				$png->setImageFormat("png");
-				$png->setImageColorSpace($colorspace);
+				// $png->setImageColorSpace($colorspace);
 				$png->setImageDepth(8);
 				$filename = str_replace('.pdf','-'.$page.'.png',$file);
 				if(!$png->writeImage($filename)){ $this->errors[] =  "Unable to write ".$filename; }
