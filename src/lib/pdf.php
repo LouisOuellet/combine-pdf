@@ -118,8 +118,6 @@ class apiPDF{
 	  if (!file_exists($file_tif)) $this->errors[] = "Original TIFF file:".$file_tif." does not exist";
 	  if (!file_exists($cmd_ps2pdf)) $this->errors[] = "Ghostscript PostScript to PDF converter not found at: ".$cmd_ps2pdf;
 	  if (!extension_loaded("imagick")) $this->errors[] = "Imagick extension not installed or not loaded";
-	  // to include the imagick extension dynamically use an optional:
-	  dl('imagick.so');
 	  // Only continue if there aren't any errors
 	  if (!count($this->errors)) {
       // Determine the file base
