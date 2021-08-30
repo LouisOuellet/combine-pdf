@@ -189,7 +189,7 @@ class apiPDF {
 			$pdf = new FPDF();
 			if($height >= $width){
 				$pdf->AddPage('P',"Letter");
-				$this->Image(
+				$pdf->Image(
 		      $file, (self::LETTER_WIDTH - $width) / 2,
 		      (self::LETTER_HEIGHT - $height) / 2,
 		      $width,
