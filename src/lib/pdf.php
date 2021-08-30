@@ -206,7 +206,7 @@ class apiPDF extends FPDF{
 		if(strpos(strtolower($file), '.png') !== false){
 			list($width, $height) = $this->resizeToFit($file);
 			$pdf = new FPDF();
-			if(imagesy($file) >= imagesx($file)){
+			if($height >= $width){
 				$pdf->AddPage('P',"Letter");
 				$this->Image(
 		      $file, (self::LETTER_WIDTH - $width) / 2,
