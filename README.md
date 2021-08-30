@@ -48,7 +48,7 @@ php combine.php
 ### Configure service
 
 ```BASH
-sudo ln -s /opt/combine-excel/init /etc/init.d/combine-pdf
+sudo ln -s /opt/combine-pdf/init /etc/init.d/combine-pdf
 sudo systemctl daemon-reload
 sudo systemctl enable combine-pdf
 sudo systemctl start combine-pdf
