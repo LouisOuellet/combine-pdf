@@ -138,8 +138,8 @@ class apiPDF{
 			for ($page = 0; $page <= $this->getNbrPages($file)-1; $page++) {
 				$png = new Imagick();
 				$png->setResolution(300,300);
-				$png->setImageFormat("png");
 				if(!$png->readImage($file."[".$page."]")){ $this->errors[] =  "Unable to read ".$file."[".$page."]"; }
+				$png->setImageFormat("png");
 				$png->setImageDepth(32);
 				$filename = str_replace('.pdf','-'.$page.'.png',$file);
 				if(!$png->writeImage($filename)){ $this->errors[] =  "Unable to write ".$filename; }
@@ -153,8 +153,8 @@ class apiPDF{
 		if(strpos(strtolower($file), '.png') !== false){
 			$pdf = new Imagick();
 			$pdf->setResolution(300,300);
-			$pdf->setFormat('pdf');
 			if(!$pdf->readImage($file)){ $this->errors[] =  "Unable to read ".$file; }
+			$pdf->setFormat('pdf');
 			$filename = str_replace('.png','.pdf',$file);
 			if(!$pdf->writeImage($filename)){ $this->errors[] =  "Unable to write ".$filename; }
 		} else { $this->errors[] =  $file." is not a PNG file"; }
