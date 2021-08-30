@@ -28,6 +28,8 @@ use Xthiago\PDFVersionConverter\Converter\GhostscriptConverter;
 
 class apiPDF{
 
+	public $errors = [];
+
 	public function __construct(){}
 
 	public function version($file){
@@ -54,17 +56,17 @@ class apiPDF{
 		return $file;
 	}
 
-	public function compress($file, $size = 10000000){
-		if(strpos(strtolower($file), '.pdf') !== false){
+	public function compress($pdf, $size = 10000000){
+		if(strpos(strtolower($pdf), '.pdf') !== false){
 			// Get Filename
-			$filename = str_replace('.pdf','',$file);
+			$tiff = str_replace('.pdf','.tiff',$pdf);
 			// Convert to TIFF
-			$tiff = $this->pdf2tiff($file);
-			$tiff = $this->resizeTiff($tiff, $size);
+			$this->pdf2tiff($pdf);
+			$this->resizeTiff($tiff, $size);
 			// converts /dir/fax.tiff to /dir/fax.pdf
-			if (($return = $this->tiff2pdf($tiff, $file)) !== true) { echo "Error:\n"; print_r($return);
-			} else { echo "success!\n"; }
-		} else { echo "This is not a PDF file\n"; }
+			$this->tiff2pdf($tiff, $pdf);
+		} else { $this->errors[] =  $file." is not a PDF file"; }
+		if(!count($this->errors)){ return true; } else { return false; }
 	}
 
 	// Compressions
@@ -74,8 +76,9 @@ class apiPDF{
 			$tiff = new Imagick($file);
 			// Setting your default compression
 			$compression_value = 40;
+			$comression_type = Imagick::COMPRESSION_JPEG;
 			// Imagick needs to know how to compress
-			$tiff->setImageCompression(COMPRESSION_JPEG);
+			$tiff->setImageCompression($comression_type);
 			$tiff->setImageCompressionQuality($compression_value);
 			// getImageLength gets the length of the file in bytes.
 			while ($tiff->getImageLength() > $size) {
@@ -83,8 +86,8 @@ class apiPDF{
 			    $tiff->setImageCompressionQuality($compression_value);
 			}
 			$tiff->writeImage($file);
-			return $file;
-		} else { echo "This is not a TIFF file\n"; }
+		} else { $this->errors[] =  $file." is not a TIFF file"; }
+		if(!count($this->errors)){ return true; } else { return false; }
 	}
 
 	// Conversions
@@ -94,6 +97,7 @@ class apiPDF{
 		$filesystem = new Filesystem();
 		$converter = new GhostscriptConverter($command, $filesystem);
 		$converter->convert($file, '1.4');
+		if(!count($this->errors)){ return true; } else { return false; }
 	}
 
 	protected function pdf2tiff($file){
@@ -103,24 +107,21 @@ class apiPDF{
 			$tiff->setImageFormat("tiff");
 			$tiff->setImageColorSpace(5);
 			$tiff->writeImage(str_replace('.pdf','.tiff',$file));
-			return str_replace('.pdf','.tiff',$file);
-		} else { echo "This is not a PDF file\n"; }
+		} else { $this->errors[] =  $file." is not a PDF file"; }
+		if(!count($this->errors)){ return true; } else { return false; }
 	}
 
 	protected function tiff2pdf($file_tif, $file_pdf){
 	  // Initialize
-	  $errors     = array();
 	  $cmd_ps2pdf = "/usr/bin/ps2pdfwr";
-	  $file_tif   = escapeshellarg($file_tif);
-	  $file_pdf   = escapeshellarg($file_pdf);
 	  // Initial Error handling
-	  if (!file_exists($file_tif)) $errors[] = "Original TIFF file:".$file_tif." does not exist";
-	  if (!file_exists($cmd_ps2pdf)) $errors[] = "Ghostscript PostScript to PDF converter not found at: ".$cmd_ps2pdf;
-	  if (!extension_loaded("imagick")) $errors[] = "Imagick extension not installed or not loaded";
+	  if (!file_exists($file_tif)) $this->errors[] = "Original TIFF file:".$file_tif." does not exist";
+	  if (!file_exists($cmd_ps2pdf)) $this->errors[] = "Ghostscript PostScript to PDF converter not found at: ".$cmd_ps2pdf;
+	  if (!extension_loaded("imagick")) $this->errors[] = "Imagick extension not installed or not loaded";
 	  // to include the imagick extension dynamically use an optional:
 	  dl('imagick.so');
 	  // Only continue if there aren't any errors
-	  if (!count($errors)) {
+	  if (!count($this->errors)) {
       // Determine the file base
       $base = $file_pdf;
       if(($ext = strrchr($file_pdf, '.')) !== false) $base = substr($file_pdf, 0, -strlen($ext));
@@ -130,17 +131,17 @@ class apiPDF{
       $document = new Imagick($file_tif);
       // Use Imagick to write multiple pages to 1 .ps file
       if (!$document->writeImages($file_ps, true)) {
-        $errors[] = "Unable to use Imagick to write multiple pages to 1  .ps file: ".$file_ps;
+        $this->errors[] = "Unable to use Imagick to write multiple pages to 1  .ps file: ".$file_ps;
       } else {
         $document->clear();
         // Use ghostscript to convert .ps -> .pdf
         exec($cmd_ps2pdf." -sPAPERSIZE=a4 ".$file_ps." ".$file_pdf, $o, $r);
         if ($r) {
-          $errors[] = "Unable to use ghostscript to convert .ps(".$file_ps.") -> .pdf(".$file_pdf."). Check rights. ";
+          $this->errors[] = "Unable to use ghostscript to convert .ps(".$file_ps.") -> .pdf(".$file_pdf."). Check rights. ";
         }
       }
 	  }
 	  // return array with errors, or true with success.
-	  if (!count($errors)) { return true; } else { return $errors; }
+		if(!count($this->errors)){ return true; } else { return false; }
 	}
 }
