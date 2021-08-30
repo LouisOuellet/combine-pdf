@@ -121,7 +121,7 @@ class apiPDF{
 			// Initialize
 			$colorspace = imagick::COLORSPACE_CMYK;
 			// Convert to TIFF
-			for ($page = 0; $page <= $this->getNbrPages($file); $page++) {
+			for ($page = 0; $page <= $this->getNbrPages($file)-1; $page++) {
 				$tiff = new Imagick();
 				$tiff->readimage($file."[".$page."]");
 				$tiff->setImageFormat("tiff");
@@ -140,7 +140,7 @@ class apiPDF{
 			$colorspace = imagick::COLORSPACE_CMYK;
 			$images = [];
 			// Convert to PNG
-			for ($page = 0; $page <= $this->getNbrPages($file); $page++) {
+			for ($page = 0; $page <= $this->getNbrPages($file)-1; $page++) {
 				$png = new Imagick();
 				$png->readimage($file."[".$page."]");
 				$png->setImageFormat("png");
@@ -151,6 +151,13 @@ class apiPDF{
 			}
 		} else { $this->errors[] =  $file." is not a PDF file"; }
 		if(!count($this->errors)){ return $images; } else { return false; }
+	}
+
+	protected function png2pdf($file){
+		$pdf = new Imagick();
+		$pdf->readImage($file);
+		$pdf->setFormat('pdf');
+		$png->writeImage(str_replace('.png','.pdf',$file));
 	}
 
 	protected function tiff2pdf($file_tif, $file_pdf){
