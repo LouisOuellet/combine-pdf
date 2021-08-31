@@ -144,7 +144,9 @@ class apiPDF {
 		$format = pathinfo($file)['extension'];
 		list($width, $height) = getimagesize($file);
 		if(strpos(strtolower($file), '.'.$format) !== false){
-			$imagick = new Imagick($file);
+			$imagick = new Imagick();
+			if(!$imagick->readImage($file)){ $this->errors[] =  "Unable to read ".$file; }
+			$imagick->setResolution($this->RESOLUTION,$this->RESOLUTION);
 			$initSize = $imagick->getImageLength();
 			$initWidth = $width;
 			$initHeight = $height;
