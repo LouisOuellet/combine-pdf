@@ -52,10 +52,10 @@ class apiPDF {
 			if(strpos(strtolower($file), '.pdf') !== false){
 				$version = $this->version($file);
 				var_dump($version);
-				var_dump(($version > 1.14));
-				if($version > 1.14){
+				var_dump(($version > 1.4));
+				if($version > 1.4){
 					echo "Converting: ".$file."\n";
-					$this->pdf2114($file);
+					$this->pdf214($file);
 				}
 				$pdf->addPDF($file, 'all');
 			}
@@ -136,7 +136,7 @@ class apiPDF {
 
 	// Conversions
 
-	protected function pdf2114($file){
+	protected function pdf214($file){
 		$command = new GhostscriptConverterCommand();
 		$filesystem = new Filesystem();
 		$converter = new GhostscriptConverter($command, $filesystem);

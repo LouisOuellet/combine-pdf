@@ -16,4 +16,4 @@ foreach($images as $image){
   $pdfs[] = str_replace('.png','.pdf',$image);
 }
 $pdf = $PDF->combine($pdfs);
-if(count($PDF->errors)){ print_r($PDF->errors); } else { print_r($pdf); }
+if(count($PDF->errors)){ print_r($PDF->errors); } else { echo $pdf."\n"; }
