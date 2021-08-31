@@ -17,6 +17,16 @@ PHP application to combine multiple PDF files into one. It also support compress
 ## Install
 ### To Install
 
+#### Install Requirements
+
+```BASH
+sudo apt-get install -y apache2 php php-common php-imap php-imagick ghostscript imagemagick imagemagick-common
+sudo nano /etc/ImageMagick-6/policy.xml
+```
+
+Replace `<policy domain="coder" rights="none" pattern="PDF" />` to `<!-- <policy domain="coder" rights="none" pattern="PDF" /> -->`
+
+#### Setup Service
 ```BASH
 cd /opt/
 sudo git clone https://github.com/LouisOuellet/php-pdf.git
@@ -36,6 +46,8 @@ sudo systemctl start php-pdf
  - php-imap
  - php-imagick
  - ghostscript
+ - imagegick
+ - imagegick-common
 
 ### Execute
 
