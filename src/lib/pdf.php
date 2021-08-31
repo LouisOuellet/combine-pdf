@@ -83,7 +83,7 @@ class apiPDF {
 		}
 		// Compiling PDF
 		$pdf->merge('file', $filename);
-		if(!count($this->errors)){ return $pdf; } else { return false; }
+		if(!count($this->errors)){ return $filename; } else { return false; }
 	}
 
 	public function compress($file, $size = null){
