@@ -72,6 +72,8 @@ class apiPDF {
 				if(!count($this->errors)){
 					foreach($images as $image){
 						// Compress Image
+						var_dump($fileSize);
+						var_dump($size);
 						if($this->compression && $fileSize > $size){ $this->compressIMG($image, ($size / $nbrPages)); }
 						// Convert to PDF
 						$pdf->addPDF($this->img2pdf($image), 'all');
