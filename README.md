@@ -1,4 +1,4 @@
-# Combine PDF
+# PHP PDF
 PHP application to combine multiple PDF files into one
 
 ## Content
