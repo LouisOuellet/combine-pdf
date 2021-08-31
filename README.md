@@ -65,7 +65,7 @@ nano settings.json
  - smtp[MANDATORY]: contains the SMTP configurations
  - imap[MANDATORY]: contains the IMAP configurations
  - destination: contains a static destination email for the service
- - pdf: contains the PDF configurations
+ - pdf: contains the PDF configurations, currently only support compression settings
 
 ### Example
 ```JSON
