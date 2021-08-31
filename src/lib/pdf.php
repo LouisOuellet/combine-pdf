@@ -147,6 +147,7 @@ class apiPDF {
 			$imagick = new Imagick($file);
 			$initSize = $imagick->getImageLength();
 			$initWidth = $width;
+			$initHeight = $height;
 			$scaleRun = 0;
 			while($imagick->getImageLength() > $size){
 				$width = $width * ($this->SCALE/100);
@@ -154,12 +155,13 @@ class apiPDF {
 				$scaleRun++;
 				if(!$imagick->scaleImage($width, $height, true)){ $this->errors[] =  "Unable to scale ".$file; }
 			}
+			if(!$imagick->writeImage($file)){ $this->errors[] =  "Unable to write ".$file; }
 			if($initWidth != $width){
+				list($width, $height) = getimagesize($file);
 				echo "Scale: ".($this->SCALE/100)."% Times:".$scaleRun."X\n";
-				echo $file." was scaled from ".$initWidth." to ".$width."\n";
+				echo $file." was scaled from ".$initWidth."x".$initHeight." to ".$width."x".$height."\n";
 				echo $file." was compressed from ".$initSize."B to ".$imagick->getImageLength()."B\n";
 			}
-			if(!$imagick->writeImage($file)){ $this->errors[] =  "Unable to write ".$file; }
 		} else { $this->errors[] =  $file." is not a ".strtoupper($format)." file"; }
 		if(!count($this->errors)){ return true; } else { return false; }
 	}
