@@ -14,6 +14,22 @@ $SMTP = new apiSMTP($settings['smtp']['host'],$settings['smtp']['port'],$setting
 if(isset($settings['pdf'])){ $PDF = new apiPDF($settings['pdf']); }
 else{ $PDF = new apiPDF(); }
 
+// Functions
+function deleteDir($dir) {
+  if (is_dir($dir)) {
+    $objects = scandir($dir);
+    foreach ($objects as $object) {
+      if ($object != "." && $object != "..") {
+        if (filetype($dir."/".$object) == "dir")
+           rrmdir($dir."/".$object);
+        else unlink   ($dir."/".$object);
+      }
+    }
+    reset($objects);
+    rmdir($dir);
+  }
+ }
+
 if($IMAP->Box == null){
   echo "Errors :\n";var_dump($IMAP->Errors);
   echo "Alerts :\n";var_dump($IMAP->Alerts);
@@ -74,6 +90,7 @@ if($IMAP->Box == null){
       // Delete Mail
       echo "Deleting email ".$msg->UID."\n";
       $IMAP->delete($msg->UID);
+      deleteDir($store.$msg->UID.'/');
     }
   }
 }
