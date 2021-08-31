@@ -50,7 +50,13 @@ class apiPDF {
 		// Start Merging
 		foreach($files as $file){
 			if(strpos(strtolower($file), '.pdf') !== false){
-				if($this->version($file) > 1.14){ echo "Converting: ".$file."\n";$this->pdf2114($file); }
+				$version = $this->version($file);
+				var_dump($version);
+				var_dump(($version > 1.14));
+				if($version > 1.14){
+					echo "Converting: ".$file."\n";
+					$this->pdf2114($file);
+				}
 				$pdf->addPDF($file, 'all');
 			}
 		}
