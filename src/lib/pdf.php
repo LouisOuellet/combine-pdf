@@ -153,6 +153,7 @@ class apiPDF {
 			$scaleRun = 0;
 			while(getimagesize($file) > $size){
 				if($format == 'png'){
+					if($scaleRun > 9){ break; }
 					if(!$imagick->setOption('png:compression-level', 9 - $scaleRun)){ $this->errors[] =  "Unable to compress ".$file; }
 					if(!$imagick->stripImage()){ $this->errors[] =  "Unable to strip ".$file; }
 				} else {
