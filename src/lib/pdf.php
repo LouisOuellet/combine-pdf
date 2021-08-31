@@ -66,13 +66,13 @@ class apiPDF {
 		return $file;
 	}
 
-	public function compress($pdf, $size = 10000000){
+	public function compress($file, $size = 10000000){
 		// Initialize
-		$pdfs = [];
-		if(strpos(strtolower($pdf), '.pdf') !== false){
+		$files = [];
+		if(strpos(strtolower($file), '.pdf') !== false){
 			// Gathering info
-			$nbrPages = $this->getNbrPages($pdf);
-			$fileSize = $this->getFileSize($pdf);
+			$nbrPages = $this->getNbrPages($file);
+			$fileSize = $this->getFileSize($file);
 			$imgSize = ($fileSize - ($fileSize - $size)) / $nbrPages;
 			// Convert to images
 			$images = $this->pdf2img($file);
@@ -81,14 +81,14 @@ class apiPDF {
 					// Compress Image
 					$this->compressIMG($image, $imgSize);
 					// Convert to PDF
-					$pdfs[] = $this->img2pdf($image);
+					$files[] = $this->img2pdf($image);
 					// Remove Image
 				  unlink($image);
 				}
 				// Compiling PDF
-				$pdf = $PDF->combine($pdfs);
+				$pdf = $PDF->combine($files);
 				// Remove PDFs
-				foreach($pdfs as $file){ unlink($file); }
+				foreach($files as $unique){ unlink($unique); }
 			}
 		} else { $this->errors[] =  $file." is not a PDF file"; }
 		if(!count($this->errors)){ return $pdf; } else { return false; }
