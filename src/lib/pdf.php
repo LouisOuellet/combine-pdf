@@ -51,12 +51,7 @@ class apiPDF {
 		foreach($files as $file){
 			if(strpos(strtolower($file), '.pdf') !== false){
 				$version = $this->version($file);
-				var_dump($version);
-				var_dump(($version > 1.4));
-				if($version > 1.4){
-					echo "Converting: ".$file."\n";
-					$this->pdf214($file);
-				}
+				if($version > 1.4){ $this->pdf214($file); }
 				$pdf->addPDF($file, 'all');
 			}
 		}
