@@ -137,10 +137,13 @@ class apiPDF {
 	protected function compressIMG($file, $size = null){
 		if($size == null){ $size = $this->SIZE/1000; }
 		$format = pathinfo($file)['extension'];
+		list($width, $height) = getimagesize($imgFilename);
 		if(strpos(strtolower($file), '.'.$format) !== false){
 			$imagick = new Imagick($file);
 			while ($imagick->getImageLength() > $size) {
-				if(!$imagick->scaleImage($this->SCALE, $this->SCALE, true)){ $this->errors[] =  "Unable to scale ".$file; }
+				$width = $width * ($this->SCALE/100);
+				$height = $height * ($this->SCALE/100);
+				if(!$imagick->scaleImage($width, $height, true)){ $this->errors[] =  "Unable to scale ".$file; }
 			}
 			if(!$imagick->writeImage($file)){ $this->errors[] =  "Unable to write ".$file; }
 		} else { $this->errors[] =  $file." is not a ".strtoupper($format)." file"; }
