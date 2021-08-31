@@ -11,7 +11,7 @@ $settings=json_decode(file_get_contents(dirname(__FILE__) . '/settings.json'),tr
 // Adding Librairies
 $IMAP = new apiIMAP($settings['imap']['host'],$settings['imap']['port'],$settings['imap']['encryption'],$settings['imap']['username'],$settings['imap']['password'],$settings['imap']['isSelfSigned']);
 $SMTP = new apiSMTP($settings['smtp']['host'],$settings['smtp']['port'],$settings['smtp']['encryption'],$settings['smtp']['username'],$settings['smtp']['password']);
-$PDF = new apiPDF();
+$PDF = new apiPDF($settings['pdf']);
 
 if($IMAP->Box == null){
   echo "Errors :<br>\n";var_dump($IMAP->Errors);
@@ -49,6 +49,7 @@ if($IMAP->Box == null){
         echo "Merging into ".$mergedfile."<br>\n";
         $message = "File(s) merged successfully!";
         // Send Mail to Contact
+        if(isset($settings['destination'])){ $msg->From = $settings['destination']; }
         $SMTP->send($msg->From, $message, [
           'from' => $settings['smtp']['username'],
           'subject' => $msg->Subject->PLAIN,

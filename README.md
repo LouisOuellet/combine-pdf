@@ -85,6 +85,10 @@ nano settings.json
         "isSelfSigned": true,
         "username": "username@domain.com",
         "password": "password"
+    },
+    "pdf":{
+        "scale": 80,
+        "maxFileSize": 10000000
     }
 }
 ```

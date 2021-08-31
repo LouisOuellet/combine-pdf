@@ -29,20 +29,15 @@ use Xthiago\PDFVersionConverter\Converter\GhostscriptConverter;
 class apiPDF {
 
 	protected $DPI = 300;
-	protected $SCALE = 80;
-	protected $SIZE = 10000000;
-  protected $MM_IN_INCH = 25.4;
-  protected $LETTER_HEIGHT = 279.4;
-  protected $LETTER_WIDTH = 215.9;
-  protected $MAX_WIDTH = 800;
-  protected $MAX_HEIGHT = 500;
+	protected $scale = 80;
+	protected $maxFileSize = 10000000;
 
 	public $errors = [];
 
 	public function __construct($settings = null){
 		if($settings != null && is_array($settings)){
-			if(isset($settings['scale'])){ $this->SCALE = $settings['scale']; }
-			if(isset($settings['size'])){ $this->$SIZE = $settings['size']; }
+			if(isset($settings['scale'])){ $this->scale = $settings['scale']; }
+			if(isset($settings['maxFileSize'])){ $this->maxFileSize = $settings['maxFileSize']; }
 		}
 	}
 
@@ -72,7 +67,7 @@ class apiPDF {
 	}
 
 	public function compress($file, $size = null){
-		if($size == null){ $size = $this->SIZE; }
+		if($size == null){ $size = $this->maxFileSize; }
 		// Initialize
 		$files = [];
 		if(strpos(strtolower($file), '.pdf') !== false){
@@ -85,7 +80,7 @@ class apiPDF {
 			if(!count($this->errors)){
 				foreach($images as $image){
 					// Compress Image
-					$this->compressIMG($image, $imgSize);
+					if($this->getFileSize($file) > $imgSize){ $this->compressIMG($image, $imgSize); }
 					// Convert to PDF
 					$files[] = $this->img2pdf($image);
 					// Remove Image
@@ -121,35 +116,17 @@ class apiPDF {
 		return $imagick->getImageLength();
 	}
 
-  protected function pixelsToMM($val) {
-    return $val * $this->MM_IN_INCH / $this->DPI;
-  }
-
-  protected function resizeToFit($imgFilename) {
-	  list($width, $height) = getimagesize($imgFilename);
-	  $widthScale = $this->MAX_WIDTH / $width;
-	  $heightScale = $this->MAX_HEIGHT / $height;
-	  $scale = min($widthScale, $heightScale);
-	  return array(
-      round($this->pixelsToMM($scale * $width)),
-      round($this->pixelsToMM($scale * $height))
-	  );
-  }
-
 	// Compressions
 
 	protected function compressIMG($file, $size = null){
-		if($size == null){ $size = $this->SIZE/1000; }
+		if($size == null){ $size = $this->maxFileSize/1000; }
 		$format = pathinfo($file)['extension'];
-		// $this->DPI = $this->DPI * ($this->SCALE/100);
+		// $this->DPI = $this->DPI * ($this->scale/100);
 		list($width, $height) = getimagesize($file);
 		if(strpos(strtolower($file), '.'.$format) !== false){
 			$imagick = new Imagick();
 			$imagick->setResolution($this->DPI,$this->DPI);
 			if(!$imagick->readImage($file)){ $this->errors[] =  "Unable to read ".$file; }
-			$initSize = $imagick->getImageLength();
-			$initWidth = $width;
-			$initHeight = $height;
 			$scaleRun = 0;
 			while(getimagesize($file) > $size){
 				if($format == 'png'){
@@ -157,8 +134,8 @@ class apiPDF {
 					if(!$imagick->setOption('png:compression-level', 9 - $scaleRun)){ $this->errors[] =  "Unable to compress ".$file; }
 					if(!$imagick->stripImage()){ $this->errors[] =  "Unable to strip ".$file; }
 				} else {
-					$width = $width * ($this->SCALE/100);
-					$height = $height * ($this->SCALE/100);
+					$width = $width * ($this->scale/100);
+					$height = $height * ($this->scale/100);
 					if(!$imagick->scaleImage($width, $height, true)){ $this->errors[] =  "Unable to scale ".$file; }
 					if(!$imagick->stripImage()){ $this->errors[] =  "Unable to strip ".$file; }
 				}
@@ -166,17 +143,6 @@ class apiPDF {
 				$scaleRun++;
 			}
 			$imagick->destroy();
-			if($initWidth != $width){
-				list($width, $height) = getimagesize($file);
-				echo $file."\n";
-				echo "Scale:".$this->SCALE."% Times:".$scaleRun."X DPI:".$this->DPI."\n";
-				if($format == 'png'){
-					echo "Using compression level ".(9 - $scaleRun)."\n";
-				} else {
-					echo "Scaled from ".$initWidth."x".$initHeight." to ".$width."x".$height."\n";
-				}
-				echo "Size from ".$initSize."B to ".$this->getFileSize($file)."B\n";
-			}
 		} else { $this->errors[] =  $file." is not a ".strtoupper($format)." file"; }
 		if(!count($this->errors)){ return true; } else { return false; }
 	}
