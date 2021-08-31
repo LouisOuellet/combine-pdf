@@ -160,7 +160,7 @@ class apiPDF {
 			// Convert to PNG
 			for ($page = 0; $page <= $this->getNbrPages($file)-1; $page++) {
 				$imagick = new Imagick();
-				$pdf->setResolution($this->RESOLUTION,$this->RESOLUTION);
+				$imagick->setResolution($this->RESOLUTION,$this->RESOLUTION);
 				if(!$imagick->readImage($file."[".$page."]")){ $this->errors[] =  "Unable to read ".$file."[".$page."]"; }
 				$imagick->setImageFormat($format);
 				$imagick->setImageDepth(32); // TesseractOCR 8
@@ -175,12 +175,12 @@ class apiPDF {
 	public function img2pdf($file){
 		$format = pathinfo($file)['extension'];
 		if(strpos(strtolower($file), '.'.$format) !== false){
-			$pdf = new Imagick();
-			$pdf->setResolution($this->RESOLUTION,$this->RESOLUTION);
-			if(!$pdf->readImage($file)){ $this->errors[] =  "Unable to read ".$file; }
-			$pdf->setFormat('pdf');
+			$imagick = new Imagick();
+			$imagick->setResolution($this->RESOLUTION,$this->RESOLUTION);
+			if(!$imagick->readImage($file)){ $this->errors[] =  "Unable to read ".$file; }
+			$imagick->setFormat('pdf');
 			$filename = str_replace('.'.$format,'.pdf',$file);
-			if(!$pdf->writeImage($filename)){ $this->errors[] =  "Unable to write ".$filename; }
+			if(!$imagick->writeImage($filename)){ $this->errors[] =  "Unable to write ".$filename; }
 		} else { $this->errors[] =  $file." is not a ".strtoupper($format)." file"; }
 		if(!count($this->errors)){ return $filename; } else { return false; }
 	}
