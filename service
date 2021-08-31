@@ -1,9 +1,9 @@
 #!/bin/bash
 
 while(true);do
-  php /opt/combine-pdf/service.php
-  if [ -f "/opt/combine-pdf/tmp" ]; then
-    rm -r /opt/combine-pdf/tmp
+  php /opt/php-pdf/service.php
+  if [ -f "/opt/php-pdf/tmp" ]; then
+    rm -r /opt/php-pdf/tmp
   fi
 done
 

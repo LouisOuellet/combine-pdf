@@ -1,6 +1,6 @@
 #!/bin/bash
 ### BEGIN INIT INFO
-# Provides:          combine-pdf
+# Provides:          php-pdf
 # Required-Start:    $all
 # Required-Stop:
 # Default-Start:     2 3 4 5
@@ -10,7 +10,7 @@
 
 case "$1" in
 start)
-   /opt/combine-pdf/service &
+   /opt/php-pdf/service &
    echo $!>/var/run/service.pid
    ;;
 stop)

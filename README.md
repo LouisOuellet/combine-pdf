@@ -19,11 +19,11 @@ PHP application to combine multiple PDF files into one. It also support compress
 
 ```BASH
 cd /opt/
-sudo git clone https://github.com/LouisOuellet/combine-pdf.git
-sudo ln -s /opt/combine-pdf/init /etc/init.d/combine-pdf
+sudo git clone https://github.com/LouisOuellet/php-pdf.git
+sudo ln -s /opt/php-pdf/init /etc/init.d/php-pdf
 sudo systemctl daemon-reload
-sudo systemctl enable combine-pdf
-sudo systemctl start combine-pdf
+sudo systemctl enable php-pdf
+sudo systemctl start php-pdf
 ```
 
 ## combine.php
@@ -54,10 +54,10 @@ php service.php
 ### Configure service
 
 ```BASH
-sudo ln -s /opt/combine-pdf/init /etc/init.d/combine-pdf
+sudo ln -s /opt/php-pdf/init /etc/init.d/php-pdf
 sudo systemctl daemon-reload
-sudo systemctl enable combine-pdf
-sudo systemctl start combine-pdf
+sudo systemctl enable php-pdf
+sudo systemctl start php-pdf
 ```
 
 ## settings.json
