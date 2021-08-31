@@ -10,7 +10,7 @@ PHP application to combine multiple PDF files into one. It also support compress
 ## Content
 
  - service.php : a PHP script that reads an IMAP mailbox and combine all PDF(x) and send them back combined.
- - service : a BASH script that executes combine.php in a loop.
+ - service : a BASH script that executes service.php in a loop.
  - init : a SHELL script to be placed in /etc/init.d/ to launch the service script in the background.
  - settings.json : A JSON file that stores all scripts settings
 
@@ -26,7 +26,7 @@ sudo systemctl enable php-pdf
 sudo systemctl start php-pdf
 ```
 
-## combine.php
+## service.php
 ### Requirements
 
  - Linux
