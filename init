@@ -8,9 +8,11 @@
 # Short-Description: Merging PDF documents
 ### END INIT INFO
 
+sourceDir=$(dirname $(readlink -f $0))
+
 case "$1" in
 start)
-   /opt/php-pdf/service &
+   ${sourceDir}/service &
    echo $!>/var/run/service.pid
    ;;
 stop)

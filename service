@@ -1,9 +1,11 @@
 #!/bin/bash
 
+sourceDir=$(dirname $(readlink -f $0))
+
 while(true);do
-  php /opt/php-pdf/service.php
-  if [ -f "/opt/php-pdf/tmp" ]; then
-    rm -r /opt/php-pdf/tmp
+  php ${sourceDir}/service.php
+  if [ -f "${sourceDir}/tmp" ]; then
+    rm -r ${sourceDir}/tmp
   fi
 done
 
