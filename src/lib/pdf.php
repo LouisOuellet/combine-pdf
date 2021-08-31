@@ -49,11 +49,21 @@ class apiPDF {
 		return floatval($guesser->guess($file));
 	}
 
-	public function combine($files){
+	public function combine($file, $size = null){
 		// Initialize PDF
 		$pdf = new \Jurosh\PDFMerge\PDFMerger;
 		$dir = pathinfo($files[0])['dirname'];
 		$filename = $dir.'/'.time().'.pdf';
+		$nbrPages = 0;
+		$fileSize = 0;
+		if($size == null){ $size = $this->maxFileSize; }
+		// Gathering info
+		foreach($files as $file){
+			if(strpos(strtolower($file), '.pdf') !== false){
+				$nbrPages = $nbrPages + $this->getNbrPages($file);
+				$fileSize = $fileSize + $this->getFileSize($file);
+			}
+		}
 		foreach($files as $file){
 			if(strpos(strtolower($file), '.pdf') !== false){
 				// Convert to images
@@ -61,7 +71,7 @@ class apiPDF {
 				if(!count($this->errors)){
 					foreach($images as $image){
 						// Compress Image
-						if($this->compression && $this->getFileSize($file) > $imgSize){ $this->compressIMG($image, $imgSize); }
+						if($this->compression && $fileSize > $size){ $this->compressIMG($image, ($size / $nbrPages)); }
 						// Convert to PDF
 						$pdf->addPDF($this->img2pdf($image), 'all');
 						// Remove Image
@@ -74,29 +84,6 @@ class apiPDF {
 		$pdf->merge('file', $filename);
 	}
 
-	public function combine2($files, $destDIR = 'tmp/', $filename = null){
-		// Create Merger Instance
-		$pdf = new \Jurosh\PDFMerge\PDFMerger;
-		// Start Merging
-		foreach($files as $file){
-			if(strpos(strtolower($file), '.pdf') !== false){
-				$version = $this->version($file);
-				echo $file." is version ".$version."\n";
-				if($version > 1.4){ $this->pdf214($file); }
-				$pdf->addPDF($file, 'all');
-			}
-		}
-		// Generate Name
-		if($filename == null){ $file = trim($destDIR,'/').'/'.time().'.pdf'; }
-		else{ $file = '/'.trim($destDIR,'/').'/'.$filename.'.pdf'; }
-		// Save Locally
-		$pdf->merge('file', $file);
-		// Compress pdf
-		if($this->compression){ $this->compress($file); }
-		// Return
-		return $file;
-	}
-
 	public function compress($file, $size = null){
 		if($size == null){ $size = $this->maxFileSize; }
 		if(strpos(strtolower($file), '.pdf') !== false){
@@ -105,13 +92,13 @@ class apiPDF {
 			// Gathering info
 			$nbrPages = $this->getNbrPages($file);
 			$fileSize = $this->getFileSize($file);
-			$imgSize = ($fileSize - ($fileSize - $size)) / $nbrPages;
+			$imgSize = $size / $nbrPages;
 			// Convert to images
 			$images = $this->pdf2img($file);
 			if(!count($this->errors)){
 				foreach($images as $image){
 					// Compress Image
-					if($this->getFileSize($file) > $imgSize){ $this->compressIMG($image, $imgSize); }
+					if($this->getFileSize($image) > $imgSize){ $this->compressIMG($image, $imgSize); }
 					// Convert to PDF
 					$pdf->addPDF($this->img2pdf($image), 'all');
 					// Remove Image
@@ -148,9 +135,8 @@ class apiPDF {
 	// Compressions
 
 	protected function compressIMG($file, $size = null){
-		if($size == null){ $size = $this->maxFileSize/1000; }
+		if($size == null){ $size = $this->maxFileSize; }
 		$format = pathinfo($file)['extension'];
-		// $this->DPI = $this->DPI * ($this->scale/100);
 		list($width, $height) = getimagesize($file);
 		if(strpos(strtolower($file), '.'.$format) !== false){
 			$imagick = new Imagick();
@@ -165,6 +151,7 @@ class apiPDF {
 				} else {
 					$width = $width * ($this->scale/100);
 					$height = $height * ($this->scale/100);
+					if($width <= 0 || $height <= 0){ break; }
 					if(!$imagick->scaleImage($width, $height, true)){ $this->errors[] =  "Unable to scale ".$file; }
 					if(!$imagick->stripImage()){ $this->errors[] =  "Unable to strip ".$file; }
 				}
