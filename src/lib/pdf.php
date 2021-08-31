@@ -161,7 +161,7 @@ class apiPDF {
 				echo $file."\n";
 				echo "Scale: ".$this->SCALE."% Times:".$scaleRun."X\n";
 				echo "Scaled from ".$initWidth."x".$initHeight." to ".$width."x".$height."\n";
-				echo "Compressed from ".$initSize."B to ".$imagick->getImageLength()."B\n";
+				echo "Compressed from ".$initSize."B to ".$this->getFileSize($file)."B\n";
 			}
 		} else { $this->errors[] =  $file." is not a ".strtoupper($format)." file"; }
 		if(!count($this->errors)){ return true; } else { return false; }
