@@ -158,9 +158,10 @@ class apiPDF {
 			if(!$imagick->writeImage($file)){ $this->errors[] =  "Unable to write ".$file; }
 			if($initWidth != $width){
 				list($width, $height) = getimagesize($file);
+				echo $file."\n";
 				echo "Scale: ".$this->SCALE."% Times:".$scaleRun."X\n";
-				echo $file." was scaled from ".$initWidth."x".$initHeight." to ".$width."x".$height."\n";
-				echo $file." was compressed from ".$initSize."B to ".$imagick->getImageLength()."B\n";
+				echo "Scaled from ".$initWidth."x".$initHeight." to ".$width."x".$height."\n";
+				echo "Compressed from ".$initSize."B to ".$imagick->getImageLength()."B\n";
 			}
 		} else { $this->errors[] =  $file." is not a ".strtoupper($format)." file"; }
 		if(!count($this->errors)){ return true; } else { return false; }
