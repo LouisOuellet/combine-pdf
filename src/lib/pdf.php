@@ -32,12 +32,15 @@ class apiPDF {
 	protected $scale = 80;
 	protected $maxFileSize = 10000000;
 
+	private $compression = false;
+
 	public $errors = [];
 
 	public function __construct($settings = null){
 		if($settings != null && is_array($settings)){
 			if(isset($settings['scale'])){ $this->scale = $settings['scale']; }
 			if(isset($settings['maxFileSize'])){ $this->maxFileSize = $settings['maxFileSize']; }
+			if(isset($settings['compression'])){ $this->compression = $settings['compression']; }
 		}
 	}
 
@@ -62,6 +65,8 @@ class apiPDF {
 		else{ $file = '/'.trim($destDIR,'/').'/'.$filename.'.pdf'; }
 		// Save Locally
 		$pdf->merge('file', $file);
+		// Compress pdf
+		if($this->compression){ $this->compress($file); }
 		// Return
 		return $file;
 	}

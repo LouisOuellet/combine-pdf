@@ -34,7 +34,7 @@ sudo systemctl start combine-pdf
 ### Execute
 
 ```BASH
-php combine.php
+php service.php
 ```
 
 ## service
@@ -62,10 +62,10 @@ To create the file simply use your favorite editor and copy/paste the example.
 nano settings.json
 ```
 
- - smtp[MANDATORY]: contains the SMTP configuration
- - imap[MANDATORY]: contains the IMAP configuration
- - destination: contains a static destination email
-
+ - smtp[MANDATORY]: contains the SMTP configurations
+ - imap[MANDATORY]: contains the IMAP configurations
+ - destination: contains a static destination email for the service
+ - pdf: contains the PDF configurations
 
 ### Example
 ```JSON
@@ -88,7 +88,8 @@ nano settings.json
     },
     "pdf":{
         "scale": 80,
-        "maxFileSize": 10000000
+        "maxFileSize": 10000000,
+        "compression": false
     }
 }
 ```
