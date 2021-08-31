@@ -141,29 +141,39 @@ class apiPDF {
 	protected function compressIMG($file, $size = null){
 		if($size == null){ $size = $this->SIZE/1000; }
 		$format = pathinfo($file)['extension'];
-		$dpi = $this->DPI * ($this->SCALE/100);
+		// $this->DPI = $this->DPI * ($this->SCALE/100);
 		list($width, $height) = getimagesize($file);
 		if(strpos(strtolower($file), '.'.$format) !== false){
 			$imagick = new Imagick();
-			$imagick->setResolution($dpi,$dpi);
+			$imagick->setResolution($this->DPI,$this->DPI);
 			if(!$imagick->readImage($file)){ $this->errors[] =  "Unable to read ".$file; }
 			$initSize = $imagick->getImageLength();
 			$initWidth = $width;
 			$initHeight = $height;
 			$scaleRun = 0;
 			while($imagick->getImageLength() > $size){
-				$width = $width * ($this->SCALE/100);
-				$height = $height * ($this->SCALE/100);
+				if($format == 'png'){
+					if(!$imagick->setOption('png:compression-level', 9 - $scaleRun)){ $this->errors[] =  "Unable to compress ".$file; }
+					if(!$imagick->stripImage()){ $this->errors[] =  "Unable to strip ".$file; }
+				} else {
+					$width = $width * ($this->SCALE/100);
+					$height = $height * ($this->SCALE/100);
+					if(!$imagick->scaleImage($width, $height, true)){ $this->errors[] =  "Unable to scale ".$file; }
+					if(!$imagick->stripImage()){ $this->errors[] =  "Unable to strip ".$file; }
+				}
 				$scaleRun++;
-				if(!$imagick->scaleImage($width, $height, true)){ $this->errors[] =  "Unable to scale ".$file; }
 			}
 			if(!$imagick->writeImage($file)){ $this->errors[] =  "Unable to write ".$file; }
 			$imagick->destroy();
 			if($initWidth != $width){
 				list($width, $height) = getimagesize($file);
 				echo $file."\n";
-				echo "Scale:".$this->SCALE."% Times:".$scaleRun."X DPI:".$dpi."\n";
-				echo "Scaled from ".$initWidth."x".$initHeight." to ".$width."x".$height."\n";
+				echo "Scale:".$this->SCALE."% Times:".$scaleRun."X DPI:".$this->DPI."\n";
+				if($format == 'png'){
+					echo "Using compression level ".(9 - $scaleRun)."\n"s
+				} else {
+					echo "Scaled from ".$initWidth."x".$initHeight." to ".$width."x".$height."\n";
+				}
 				echo "Size from ".$initSize."B to ".$this->getFileSize($file)."B\n";
 			}
 		} else { $this->errors[] =  $file." is not a ".strtoupper($format)." file"; }
