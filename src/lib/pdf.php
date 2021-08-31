@@ -49,7 +49,7 @@ class apiPDF {
 		return floatval($guesser->guess($file));
 	}
 
-	public function combine($file, $size = null){
+	public function combine($files, $size = null){
 		// Initialize PDF
 		$pdf = new \Jurosh\PDFMerge\PDFMerger;
 		$dir = pathinfo($files[0])['dirname'];
@@ -64,6 +64,7 @@ class apiPDF {
 				$fileSize = $fileSize + $this->getFileSize($file);
 			}
 		}
+		// Combining
 		foreach($files as $file){
 			if(strpos(strtolower($file), '.pdf') !== false){
 				// Convert to images
