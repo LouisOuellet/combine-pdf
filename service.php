@@ -46,7 +46,7 @@ if($IMAP->Box == null){
       }
       // Merge Files
       if(!empty($files)){
-        $mergedfile = $PDF->combine($files,$store.$msg->UID.'/');
+        $mergedfile = $PDF->combine($files);
         if(count($PDF->errors)){ print_r($PDF->errors); }
         echo "Merging into ".$mergedfile."\n";
         $message = "File(s) merged successfully!";
