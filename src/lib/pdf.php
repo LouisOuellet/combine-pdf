@@ -31,6 +31,7 @@ class apiPDF {
 	protected $DPI = 96;
 	protected $RESOLUTION = 300;
 	protected $SCALE = 80;
+	protected $SIZE = 10000000;
   protected $MM_IN_INCH = 25.4;
   protected $LETTER_HEIGHT = 279.4;
   protected $LETTER_WIDTH = 215.9;
@@ -66,7 +67,8 @@ class apiPDF {
 		return $file;
 	}
 
-	public function compress($file, $size = 10000000){
+	public function compress($file, $size = null){
+		if($size == null){ $size = $this->SIZE; }
 		// Initialize
 		$files = [];
 		if(strpos(strtolower($file), '.pdf') !== false){
@@ -86,7 +88,7 @@ class apiPDF {
 				  unlink($image);
 				}
 				// Compiling PDF
-				$pdf = $PDF->combine($files);
+				$pdf = $this->combine($files);
 				// Remove PDFs
 				foreach($files as $unique){ unlink($unique); }
 			}
@@ -132,7 +134,8 @@ class apiPDF {
 
 	// Compressions
 
-	protected function compressIMG($file, $size = 10000){
+	protected function compressIMG($file, $size = null){
+		if($size == null){ $size = $this->SIZE/1000; }
 		$format = pathinfo($file)['extension'];
 		if(strpos(strtolower($file), '.'.$format) !== false){
 			$imagick = new Imagick($file);
@@ -154,7 +157,7 @@ class apiPDF {
 		if(!count($this->errors)){ return true; } else { return false; }
 	}
 
-	public function pdf2img($file, $format = 'png'){
+	protected function pdf2img($file, $format = 'png'){
 		if(strpos(strtolower($file), '.pdf') !== false){
 			$images = [];
 			// Convert to PNG
@@ -172,7 +175,7 @@ class apiPDF {
 		if(!count($this->errors)){ return $images; } else { return false; }
 	}
 
-	public function img2pdf($file){
+	protected function img2pdf($file){
 		$format = pathinfo($file)['extension'];
 		if(strpos(strtolower($file), '.'.$format) !== false){
 			$imagick = new Imagick();
