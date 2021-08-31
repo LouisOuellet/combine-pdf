@@ -12,7 +12,7 @@ $size = 10000000; //10mb
 $pdfs = [];
 $images = $PDF->pdf2png($file);
 foreach($images as $image){
-  if(!$PDF->png2pdff($image)){ print_r($PDF->errors); }
+  if(!$PDF->png2pdf($image)){ print_r($PDF->errors); }
   $pdfs[] = str_replace('.png','.pdf',$image);
 }
 $pdf = $PDF->combine($pdfs);
