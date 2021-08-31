@@ -50,13 +50,13 @@ class apiPDF {
 	}
 
 	public function combine($files, $size = null){
+		if($size == null){ $size = $this->maxFileSize; }
 		// Initialize PDF
 		$pdf = new \Jurosh\PDFMerge\PDFMerger;
 		$dir = pathinfo($files[0])['dirname'];
 		$filename = $dir.'/'.time().'.pdf';
 		$nbrPages = 0;
 		$fileSize = 0;
-		if($size == null){ $size = $this->maxFileSize; }
 		// Gathering info
 		foreach($files as $file){
 			if(strpos(strtolower($file), '.pdf') !== false){
@@ -74,6 +74,7 @@ class apiPDF {
 						// Compress Image
 						var_dump($fileSize);
 						var_dump($size);
+						var_dump($this->maxFileSize);
 						if($this->compression && $fileSize > $size){ $this->compressIMG($image, ($size / $nbrPages)); }
 						// Convert to PDF
 						$pdf->addPDF($this->img2pdf($image), 'all');
