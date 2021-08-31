@@ -170,7 +170,7 @@ class apiPDF {
 				echo $file."\n";
 				echo "Scale:".$this->SCALE."% Times:".$scaleRun."X DPI:".$this->DPI."\n";
 				if($format == 'png'){
-					echo "Using compression level ".(9 - $scaleRun)."\n"s
+					echo "Using compression level ".(9 - $scaleRun)."\n";
 				} else {
 					echo "Scaled from ".$initWidth."x".$initHeight." to ".$width."x".$height."\n";
 				}
