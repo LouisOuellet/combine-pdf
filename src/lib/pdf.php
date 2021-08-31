@@ -28,12 +28,14 @@ use Xthiago\PDFVersionConverter\Converter\GhostscriptConverter;
 
 class apiPDF {
 
-	const DPI = 96;
-  const MM_IN_INCH = 25.4;
-  const LETTER_HEIGHT = 279.4;
-  const LETTER_WIDTH = 215.9;
-  const MAX_WIDTH = 800;
-  const MAX_HEIGHT = 500;
+	protected $DPI = 96;
+	protected $RESOLUTION = 300;
+	protected $SCALE = 80;
+  protected $MM_IN_INCH = 25.4;
+  protected $LETTER_HEIGHT = 279.4;
+  protected $LETTER_WIDTH = 215.9;
+  protected $MAX_WIDTH = 800;
+  protected $MAX_HEIGHT = 500;
 
 	public $errors = [];
 
@@ -65,16 +67,31 @@ class apiPDF {
 	}
 
 	public function compress($pdf, $size = 10000000){
-		// if(strpos(strtolower($pdf), '.pdf') !== false){
-		// 	// Get Filename
-		// 	$tiff = str_replace('.pdf','.tiff',$pdf);
-		// 	// Convert to TIFF
-		// 	$this->pdf2tiff($pdf);
-		// 	$this->resizeTiff($tiff, $size);
-		// 	// converts /dir/fax.tiff to /dir/fax.pdf
-		// 	$this->tiff2pdf($tiff, $pdf);
-		// } else { $this->errors[] =  $file." is not a PDF file"; }
-		// if(!count($this->errors)){ return true; } else { return false; }
+		// Initialize
+		$pdfs = [];
+		if(strpos(strtolower($pdf), '.pdf') !== false){
+			// Gathering info
+			$nbrPages = $this->getNbrPages($pdf);
+			$fileSize = $this->getFileSize($pdf);
+			$imgSize = ($fileSize - ($fileSize - $size)) / $nbrPages;
+			// Convert to images
+			$images = $this->pdf2img($file);
+			if(!count($this->errors)){
+				foreach($images as $image){
+					// Compress Image
+					$this->compressIMG($image, $imgSize);
+					// Convert to PDF
+					$pdfs[] = $this->img2pdf($image);
+					// Remove Image
+				  unlink($image);
+				}
+				// Compiling PDF
+				$pdf = $PDF->combine($pdfs);
+				// Remove PDFs
+				foreach($pdfs as $file){ unlink($file); }
+			}
+		} else { $this->errors[] =  $file." is not a PDF file"; }
+		if(!count($this->errors)){ return $pdf; } else { return false; }
 	}
 
 	// OCR
@@ -89,18 +106,23 @@ class apiPDF {
 	// Helpers
 
 	protected function getNbrPages($file){
-		$document = new Imagick($file);
-		return $document->getNumberImages();
+		$imagick = new Imagick($file);
+		return $imagick->getNumberImages();
+	}
+
+	protected function getFileSize($file){
+		$imagick = new Imagick($file);
+		return $imagick->getImageLength();
 	}
 
   protected function pixelsToMM($val) {
-    return $val * self::MM_IN_INCH / self::DPI;
+    return $val * $this->MM_IN_INCH / $this->DPI;
   }
 
   protected function resizeToFit($imgFilename) {
 	  list($width, $height) = getimagesize($imgFilename);
-	  $widthScale = self::MAX_WIDTH / $width;
-	  $heightScale = self::MAX_HEIGHT / $height;
+	  $widthScale = $this->MAX_WIDTH / $width;
+	  $heightScale = $this->MAX_HEIGHT / $height;
 	  $scale = min($widthScale, $heightScale);
 	  return array(
       round($this->pixelsToMM($scale * $width)),
@@ -110,23 +132,16 @@ class apiPDF {
 
 	// Compressions
 
-	protected function resizeTiff($file, $size = 10000000){
-		// if(strpos(strtolower($file), '.tiff') !== false){
-		// 	$tiff = new Imagick($file);
-		// 	// Setting your default compression
-		// 	$compression_value = 40;
-		// 	$comression_type = Imagick::COMPRESSION_JPEG;
-		// 	// Imagick needs to know how to compress
-		// 	$tiff->setImageCompression($comression_type);
-		// 	$tiff->setImageCompressionQuality($compression_value);
-		// 	// getImageLength gets the length of the file in bytes.
-		// 	while ($tiff->getImageLength() > $size) {
-		// 	    $compression_value = $compression_value +1;
-		// 	    $tiff->setImageCompressionQuality($compression_value);
-		// 	}
-		// 	$tiff->writeImage($file);
-		// } else { $this->errors[] =  $file." is not a TIFF file"; }
-		// if(!count($this->errors)){ return true; } else { return false; }
+	protected function compressIMG($file, $size = 10000){
+		$format = pathinfo($file)['extension'];
+		if(strpos(strtolower($file), '.'.$format) !== false){
+			$imagick = new Imagick($file);
+			while ($imagick->getImageLength() > $size) {
+				if(!$imagick->scaleImage($this->SCALE, $this->SCALE, true)){ $this->errors[] =  "Unable to scale ".$file; }
+			}
+			if(!$imagick->writeImage($file)){ $this->errors[] =  "Unable to write ".$file; }
+		} else { $this->errors[] =  $file." is not a ".strtoupper($format)." file"; }
+		if(!count($this->errors)){ return true; } else { return false; }
 	}
 
 	// Conversions
@@ -139,76 +154,62 @@ class apiPDF {
 		if(!count($this->errors)){ return true; } else { return false; }
 	}
 
-	protected function pdf2tiff($file){
-		if(strpos(strtolower($file), '.pdf') !== false){
-			// Convert to TIFF
-			for ($page = 0; $page <= $this->getNbrPages($file)-1; $page++) {
-				$tiff = new Imagick();
-				$tiff->readimage($file."[".$page."]");
-				$tiff->setImageFormat("tiff");
-				$tiff->setImageDepth(32);
-				$tiff->writeImage(str_replace('.pdf','-'.$page.'.tiff',$file));
-				$images[] = str_replace('.pdf','-'.$page.'.tiff',$file);
-			}
-		} else { $this->errors[] =  $file." is not a PDF file"; }
-		if(!count($this->errors)){ return $images; } else { return false; }
-	}
-
-	public function pdf2png($file){
+	public function pdf2img($file, $format = 'png'){
 		if(strpos(strtolower($file), '.pdf') !== false){
 			$images = [];
 			// Convert to PNG
 			for ($page = 0; $page <= $this->getNbrPages($file)-1; $page++) {
-				$png = new Imagick();
-				$png->setResolution(300,300);
-				if(!$png->readImage($file."[".$page."]")){ $this->errors[] =  "Unable to read ".$file."[".$page."]"; }
-				$png->setImageFormat("png");
-				$png->setImageDepth(32); // TesseractOCR 8
-				$filename = str_replace('.pdf','-'.$page.'.png',$file);
-				if(!$png->writeImage($filename)){ $this->errors[] =  "Unable to write ".$filename; }
+				$imagick = new Imagick();
+				$pdf->setResolution($this->RESOLUTION,$this->RESOLUTION);
+				if(!$imagick->readImage($file."[".$page."]")){ $this->errors[] =  "Unable to read ".$file."[".$page."]"; }
+				$imagick->setImageFormat($format);
+				$imagick->setImageDepth(32); // TesseractOCR 8
+				$filename = str_replace('.pdf','-'.$page.'.'.$format,$file);
+				if(!$imagick->writeImage($filename)){ $this->errors[] =  "Unable to write ".$filename; }
 				$images[] = $filename;
 			}
 		} else { $this->errors[] =  $file." is not a PDF file"; }
 		if(!count($this->errors)){ return $images; } else { return false; }
 	}
 
-	public function png2pdf($file){
-		if(strpos(strtolower($file), '.png') !== false){
+	public function img2pdf($file){
+		$format = pathinfo($file)['extension'];
+		if(strpos(strtolower($file), '.'.$format) !== false){
 			$pdf = new Imagick();
-			$pdf->setResolution(300,300);
+			$pdf->setResolution($this->RESOLUTION,$this->RESOLUTION);
 			if(!$pdf->readImage($file)){ $this->errors[] =  "Unable to read ".$file; }
 			$pdf->setFormat('pdf');
-			$filename = str_replace('.png','.pdf',$file);
+			$filename = str_replace('.'.$format,'.pdf',$file);
 			if(!$pdf->writeImage($filename)){ $this->errors[] =  "Unable to write ".$filename; }
-		} else { $this->errors[] =  $file." is not a PNG file"; }
-		if(!count($this->errors)){ return true; } else { return false; }
+		} else { $this->errors[] =  $file." is not a ".strtoupper($format)." file"; }
+		if(!count($this->errors)){ return $filename; } else { return false; }
 	}
 
-	public function png2pdff($file){
-		if(strpos(strtolower($file), '.png') !== false){
-			list($width, $height) = $this->resizeToFit($file);
-			$pdf = new FPDF();
-			if($height >= $width){
-				$pdf->AddPage('P',"Letter");
-				$pdf->Image(
-		      $file, (self::LETTER_WIDTH - $width) / 2,
-		      (self::LETTER_HEIGHT - $height) / 2,
-		      $width,
-		      $height
-		    );
-			} else {
-				$pdf->AddPage('L',"Letter");
-				$pdf->Image(
-		      $file, (self::LETTER_HEIGHT - $width) / 2,
-		      (self::LETTER_WIDTH - $height) / 2,
-		      $width,
-		      $height
-		    );
-			}
-			// $pdf->Image($file, 0, 0);
-			$filename = str_replace('.png','.pdf',$file);
-			$pdf->Output('F', $filename, true);
-		} else { $this->errors[] =  $file." is not a PNG file"; }
-		if(!count($this->errors)){ return true; } else { return false; }
-	}
+	// public function png2pdff($file){
+	// 	if(strpos(strtolower($file), '.png') !== false){
+	// 		list($width, $height) = $this->resizeToFit($file);
+	// 		$pdf = new FPDF();
+	// 		if($height >= $width){
+	// 			$pdf->AddPage('P',"Letter");
+	// 			$pdf->Image(
+	// 	      $file, ($this->LETTER_WIDTH - $width) / 2,
+	// 	      ($this->LETTER_HEIGHT - $height) / 2,
+	// 	      $width,
+	// 	      $height
+	// 	    );
+	// 		} else {
+	// 			$pdf->AddPage('L',"Letter");
+	// 			$pdf->Image(
+	// 	      $file, ($this->LETTER_HEIGHT - $width) / 2,
+	// 	      ($this->LETTER_WIDTH - $height) / 2,
+	// 	      $width,
+	// 	      $height
+	// 	    );
+	// 		}
+	// 		// $pdf->Image($file, 0, 0);
+	// 		$filename = str_replace('.png','.pdf',$file);
+	// 		$pdf->Output('F', $filename, true);
+	// 	} else { $this->errors[] =  $file." is not a PNG file"; }
+	// 	if(!count($this->errors)){ return true; } else { return false; }
+	// }
 }
