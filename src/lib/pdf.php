@@ -146,7 +146,7 @@ class apiPDF {
 				$height = $height * ($this->SCALE/100);
 				if(!$imagick->scaleImage($width, $height, true)){ $this->errors[] =  "Unable to scale ".$file; }
 			}
-			echo $file." was compressed from ".$initSize." to ".$imagick->getImageLength();
+			echo $file." was compressed from ".$initSize." to ".$imagick->getImageLength()."\n";
 			if(!$imagick->writeImage($file)){ $this->errors[] =  "Unable to write ".$file; }
 		} else { $this->errors[] =  $file." is not a ".strtoupper($format)." file"; }
 		if(!count($this->errors)){ return true; } else { return false; }
