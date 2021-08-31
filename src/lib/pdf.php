@@ -28,8 +28,7 @@ use Xthiago\PDFVersionConverter\Converter\GhostscriptConverter;
 
 class apiPDF {
 
-	protected $DPI = 96;
-	protected $RESOLUTION = 300;
+	protected $DPI = 300;
 	protected $SCALE = 80;
 	protected $SIZE = 10000000;
   protected $MM_IN_INCH = 25.4;
@@ -142,11 +141,12 @@ class apiPDF {
 	protected function compressIMG($file, $size = null){
 		if($size == null){ $size = $this->SIZE/1000; }
 		$format = pathinfo($file)['extension'];
+		$dpi = $this->DPI * ($this->SCALE/100);
 		list($width, $height) = getimagesize($file);
 		if(strpos(strtolower($file), '.'.$format) !== false){
 			$imagick = new Imagick();
+			$imagick->setResolution($dpi,$dpi);
 			if(!$imagick->readImage($file)){ $this->errors[] =  "Unable to read ".$file; }
-			$imagick->setResolution($this->RESOLUTION,$this->RESOLUTION);
 			$initSize = $imagick->getImageLength();
 			$initWidth = $width;
 			$initHeight = $height;
@@ -158,12 +158,13 @@ class apiPDF {
 				if(!$imagick->scaleImage($width, $height, true)){ $this->errors[] =  "Unable to scale ".$file; }
 			}
 			if(!$imagick->writeImage($file)){ $this->errors[] =  "Unable to write ".$file; }
+			$imagick->destroy();
 			if($initWidth != $width){
 				list($width, $height) = getimagesize($file);
 				echo $file."\n";
-				echo "Scale: ".$this->SCALE."% Times:".$scaleRun."X\n";
+				echo "Scale:".$this->SCALE."% Times:".$scaleRun."X DPI:".$dpi."\n";
 				echo "Scaled from ".$initWidth."x".$initHeight." to ".$width."x".$height."\n";
-				echo "Compressed from ".$initSize."B to ".$this->getFileSize($file)."B\n";
+				echo "Size from ".$initSize."B to ".$this->getFileSize($file)."B\n";
 			}
 		} else { $this->errors[] =  $file." is not a ".strtoupper($format)." file"; }
 		if(!count($this->errors)){ return true; } else { return false; }
@@ -185,12 +186,13 @@ class apiPDF {
 			// Convert to PNG
 			for ($page = 0; $page <= $this->getNbrPages($file)-1; $page++) {
 				$imagick = new Imagick();
-				$imagick->setResolution($this->RESOLUTION,$this->RESOLUTION);
+				$imagick->setResolution($this->DPI,$this->DPI);
 				if(!$imagick->readImage($file."[".$page."]")){ $this->errors[] =  "Unable to read ".$file."[".$page."]"; }
 				$imagick->setImageFormat($format);
 				$imagick->setImageDepth(32); // TesseractOCR 8
 				$filename = str_replace('.pdf','-'.$page.'.'.$format,$file);
 				if(!$imagick->writeImage($filename)){ $this->errors[] =  "Unable to write ".$filename; }
+				$imagick->destroy();
 				$images[] = $filename;
 			}
 		} else { $this->errors[] =  $file." is not a PDF file"; }
@@ -201,40 +203,13 @@ class apiPDF {
 		$format = pathinfo($file)['extension'];
 		if(strpos(strtolower($file), '.'.$format) !== false){
 			$imagick = new Imagick();
-			$imagick->setResolution($this->RESOLUTION,$this->RESOLUTION);
+			$imagick->setResolution($this->DPI,$this->DPI);
 			if(!$imagick->readImage($file)){ $this->errors[] =  "Unable to read ".$file; }
 			$imagick->setFormat('pdf');
 			$filename = str_replace('.'.$format,'.pdf',$file);
 			if(!$imagick->writeImage($filename)){ $this->errors[] =  "Unable to write ".$filename; }
+			$imagick->destroy();
 		} else { $this->errors[] =  $file." is not a ".strtoupper($format)." file"; }
 		if(!count($this->errors)){ return $filename; } else { return false; }
 	}
-
-	// public function png2pdff($file){
-	// 	if(strpos(strtolower($file), '.png') !== false){
-	// 		list($width, $height) = $this->resizeToFit($file);
-	// 		$pdf = new FPDF();
-	// 		if($height >= $width){
-	// 			$pdf->AddPage('P',"Letter");
-	// 			$pdf->Image(
-	// 	      $file, ($this->LETTER_WIDTH - $width) / 2,
-	// 	      ($this->LETTER_HEIGHT - $height) / 2,
-	// 	      $width,
-	// 	      $height
-	// 	    );
-	// 		} else {
-	// 			$pdf->AddPage('L',"Letter");
-	// 			$pdf->Image(
-	// 	      $file, ($this->LETTER_HEIGHT - $width) / 2,
-	// 	      ($this->LETTER_WIDTH - $height) / 2,
-	// 	      $width,
-	// 	      $height
-	// 	    );
-	// 		}
-	// 		// $pdf->Image($file, 0, 0);
-	// 		$filename = str_replace('.png','.pdf',$file);
-	// 		$pdf->Output('F', $filename, true);
-	// 	} else { $this->errors[] =  $file." is not a PNG file"; }
-	// 	if(!count($this->errors)){ return true; } else { return false; }
-	// }
 }
