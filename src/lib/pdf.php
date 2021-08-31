@@ -151,7 +151,7 @@ class apiPDF {
 			$initWidth = $width;
 			$initHeight = $height;
 			$scaleRun = 0;
-			while($imagick->getImageLength() > $size){
+			while(getimagesize($file) > $size){
 				if($format == 'png'){
 					if(!$imagick->setOption('png:compression-level', 9 - $scaleRun)){ $this->errors[] =  "Unable to compress ".$file; }
 					if(!$imagick->stripImage()){ $this->errors[] =  "Unable to strip ".$file; }
@@ -161,9 +161,9 @@ class apiPDF {
 					if(!$imagick->scaleImage($width, $height, true)){ $this->errors[] =  "Unable to scale ".$file; }
 					if(!$imagick->stripImage()){ $this->errors[] =  "Unable to strip ".$file; }
 				}
+				if(!$imagick->writeImage($file)){ $this->errors[] =  "Unable to write ".$file; }
 				$scaleRun++;
 			}
-			if(!$imagick->writeImage($file)){ $this->errors[] =  "Unable to write ".$file; }
 			$imagick->destroy();
 			if($initWidth != $width){
 				list($width, $height) = getimagesize($file);
