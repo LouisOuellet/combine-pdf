@@ -137,7 +137,7 @@ class apiPDF {
 	protected function compressIMG($file, $size = null){
 		if($size == null){ $size = $this->SIZE/1000; }
 		$format = pathinfo($file)['extension'];
-		list($width, $height) = getimagesize($imgFilename);
+		list($width, $height) = getimagesize($file);
 		if(strpos(strtolower($file), '.'.$format) !== false){
 			$imagick = new Imagick($file);
 			while ($imagick->getImageLength() > $size) {
