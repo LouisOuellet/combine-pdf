@@ -49,7 +49,32 @@ class apiPDF {
 		return floatval($guesser->guess($file));
 	}
 
-	public function combine($files, $destDIR = 'tmp/', $filename = null){
+	public function combine($files){
+		// Initialize PDF
+		$pdf = new \Jurosh\PDFMerge\PDFMerger;
+		$dir = pathinfo($files[0])['dirname'];
+		$filename = $dir.'/'.time().'.pdf';
+		foreach($files as $file){
+			if(strpos(strtolower($file), '.pdf') !== false){
+				// Convert to images
+				$images = $this->pdf2img($file);
+				if(!count($this->errors)){
+					foreach($images as $image){
+						// Compress Image
+						if($this->compression && $this->getFileSize($file) > $imgSize){ $this->compressIMG($image, $imgSize); }
+						// Convert to PDF
+						$pdf->addPDF($this->img2pdf($image), 'all');
+						// Remove Image
+						unlink($image);
+					}
+				}
+			} else { $this->errors[] =  $file." is not a PDF file"; }
+		}
+		// Compiling PDF
+		$pdf->merge('file', $filename);
+	}
+
+	public function combine2($files, $destDIR = 'tmp/', $filename = null){
 		// Create Merger Instance
 		$pdf = new \Jurosh\PDFMerge\PDFMerger;
 		// Start Merging
@@ -74,9 +99,9 @@ class apiPDF {
 
 	public function compress($file, $size = null){
 		if($size == null){ $size = $this->maxFileSize; }
-		// Initialize
-		$files = [];
 		if(strpos(strtolower($file), '.pdf') !== false){
+			// Initialize PDF
+			$pdf = new \Jurosh\PDFMerge\PDFMerger;
 			// Gathering info
 			$nbrPages = $this->getNbrPages($file);
 			$fileSize = $this->getFileSize($file);
@@ -88,14 +113,12 @@ class apiPDF {
 					// Compress Image
 					if($this->getFileSize($file) > $imgSize){ $this->compressIMG($image, $imgSize); }
 					// Convert to PDF
-					$files[] = $this->img2pdf($image);
+					$pdf->addPDF($this->img2pdf($image), 'all');
 					// Remove Image
 				  unlink($image);
 				}
 				// Compiling PDF
-				$pdf = $this->combine($files);
-				// Remove PDFs
-				foreach($files as $unique){ unlink($unique); }
+				$pdf->merge('file', $file);
 			}
 		} else { $this->errors[] =  $file." is not a PDF file"; }
 		if(!count($this->errors)){ return $pdf; } else { return false; }
