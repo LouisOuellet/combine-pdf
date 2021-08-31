@@ -15,8 +15,8 @@ if(isset($settings['pdf'])){ $PDF = new apiPDF($settings['pdf']); }
 else{ $PDF = new apiPDF(); }
 
 if($IMAP->Box == null){
-  echo "Errors :<br>\n";var_dump($IMAP->Errors);
-  echo "Alerts :<br>\n";var_dump($IMAP->Alerts);
+  echo "Errors :\n";var_dump($IMAP->Errors);
+  echo "Alerts :\n";var_dump($IMAP->Alerts);
 } else {
   $store = dirname(__FILE__) . '/tmp/';
   if(!is_dir($store)){mkdir($store);}
@@ -24,11 +24,11 @@ if($IMAP->Box == null){
   if(!is_dir($store)){mkdir($store);}
   $store .= $settings['imap']['username'].'/';
   if(!is_dir($store)){mkdir($store);}
-  echo "Opening Mailbox ".$settings['imap']['username']."<br>\n";
+  echo "Opening Mailbox ".$settings['imap']['username']."\n";
   if($IMAP->NewMSG != null){
-    echo "Reading Mailbox ".$settings['imap']['username']."<br>\n";
+    echo "Reading Mailbox ".$settings['imap']['username']."\n";
     foreach($IMAP->NewMSG as $msg){
-      echo "Looking at message[".$msg->ID."]".$msg->Subject->PLAIN."<br>\n";
+      echo "Looking at message[".$msg->ID."]".$msg->Subject->PLAIN."\n";
       $files = [];
       if(!is_dir($store.$msg->UID.'/')){mkdir($store.$msg->UID.'/');}
       // Saving Attachments
@@ -37,7 +37,7 @@ if($IMAP->Box == null){
           $filename = time().".dat";
           if(isset($file['filename'])){ $filename = $file['filename']; }
           if(isset($file['name'])){ $filename = $file['name']; }
-          echo "Saving in ".$store.$msg->UID.'/'.$filename."<br>\n";
+          echo "Saving in ".$store.$msg->UID.'/'.$filename."\n";
           $fp = fopen($store.$msg->UID.'/' . $filename, "w+");
           fwrite($fp, $file['attachment']);
           fclose($fp);
@@ -48,7 +48,7 @@ if($IMAP->Box == null){
       if(!empty($files)){
         $mergedfile = $PDF->combine($files,$store.$msg->UID.'/');
         if(count($PDF->errors)){ print_r($PDF->errors); }
-        echo "Merging into ".$mergedfile."<br>\n";
+        echo "Merging into ".$mergedfile."\n";
         $message = "File(s) merged successfully!";
         // Send Mail to Contact
         if(isset($settings['destination'])){ $msg->From = $settings['destination']; }
@@ -58,7 +58,7 @@ if($IMAP->Box == null){
           'attachments' => [$mergedfile],
         ]);
       } else {
-        echo "No File Found!<br>\n";
+        echo "No File Found!\n";
         $message = "No File Found!";
         // Send Mail to Contact
         if(isset($settings['destination'])){ $msg->From = $settings['destination']; }
@@ -66,13 +66,13 @@ if($IMAP->Box == null){
           'from' => $settings['smtp']['username'],
           'subject' => $msg->Subject->PLAIN,
         ]);
-        echo "Sending email to ".$msg->From."<br>\n";
+        echo "Sending email to ".$msg->From."\n";
       }
       // Set Mail Status to Read
-      echo "Setting email ".$msg->UID." as read<br>\n";
+      echo "Setting email ".$msg->UID." as read\n";
       $IMAP->read($msg->UID);
       // Delete Mail
-      echo "Deleting email ".$msg->UID."<br>\n";
+      echo "Deleting email ".$msg->UID."\n";
       $IMAP->delete($msg->UID);
     }
   }
