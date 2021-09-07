@@ -1,4 +1,4 @@
-# PHP PDF
+# PHP PDF[BETA]
 PHP application to combine multiple PDF files into one. It also support compressions if your receiver does not support files above a certain size. This application does not yet support Compact PDF. It uses different techniques to reduce the size of your PDF file such as removing all OCR and converting all pages to simple images.
 
 ## Planned
