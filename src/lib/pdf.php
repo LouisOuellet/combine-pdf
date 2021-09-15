@@ -125,13 +125,17 @@ class apiPDF {
 	// Helpers
 
 	protected function getNbrPages($file){
-		$imagick = new Imagick($file);
-		return $imagick->getNumberImages();
+		if(file_exists($file)){
+			$imagick = new Imagick($file);
+			return $imagick->getNumberImages();
+		} else { $this->errors[] =  $file." could not be found"; }
 	}
 
 	protected function getFileSize($file){
-		$imagick = new Imagick($file);
-		return $imagick->getImageLength();
+		if(file_exists($file)){
+			$imagick = new Imagick($file);
+			return $imagick->getImageLength();
+		} else { $this->errors[] =  $file." could not be found"; }
 	}
 
 	// Compressions
