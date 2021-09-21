@@ -19,6 +19,7 @@ require_once dirname(__FILE__,3) . '/vendor/symfony/process/Pipes/PipesInterface
 require_once dirname(__FILE__,3) . '/vendor/symfony/process/Pipes/AbstractPipes.php';
 require_once dirname(__FILE__,3) . '/vendor/symfony/process/Pipes/UnixPipes.php';
 require_once dirname(__FILE__,3) . '/vendor/symfony/filesystem/Filesystem.php';
+require_once dirname(__FILE__,3) . '/vendor/FPDF_Merge-master/FPDF_Merge.php';
 
 // import the namespaces
 use Symfony\Component\Filesystem\Filesystem;
