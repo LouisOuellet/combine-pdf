@@ -56,15 +56,15 @@ class apiPDF {
 			// Initialize PDF
 			$dir = pathinfo($files[0])['dirname'];
 			$filename = $dir.'/'.time().'.pdf';
-			$cmd = "gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=$filename ";
+			$pdf = new FPDF_Merge();
 			foreach($files as $file){
 				if(strpos(strtolower($file), '.pdf') !== false){
 					echo $file."<br>\n";
-					$cmd .= $file." ";
+					$pdf->add($file);
 				}
 			}
-			return shell_exec($cmd);
-			echo $cmd;
+			echo $filename;
+			return $pdf->output($filename);
 		} else { $this->errors[] =  "No Files!"; }
 	}
 
