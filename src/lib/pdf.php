@@ -6,20 +6,24 @@ require_once dirname(__FILE__,3) . '/vendor/FPDI-2.3.6/src/FpdiException.php';
 require_once dirname(__FILE__,3) . '/vendor/FPDI-2.3.6/src/PdfParser/PdfParserException.php';
 require_once dirname(__FILE__,3) . '/vendor/FPDI-2.3.6/src/PdfParser/CrossReference/CrossReferenceException.php';
 require_once dirname(__FILE__,3) . '/vendor/FPDI-2.3.6/src/autoload.php';
-require_once dirname(__FILE__,3) . '/vendor/php-pdf-merge/src/Jurosh/PDFMerge/PDFObject.php';
-require_once dirname(__FILE__,3) . '/vendor/php-pdf-merge/src/Jurosh/PDFMerge/PDFMerger.php';
-require_once dirname(__FILE__,3) . '/vendor/pdf-version-converter-1.0.5/src/Converter/ConverterInterface.php';
-require_once dirname(__FILE__,3) . '/vendor/pdf-version-converter-1.0.5/src/Converter/GhostscriptConverter.php';
-require_once dirname(__FILE__,3) . '/vendor/pdf-version-converter-1.0.5/src/Converter/GhostscriptConverterCommand.php';
-require_once dirname(__FILE__,3) . '/vendor/pdf-version-converter-1.0.5/src/Guesser/GuesserInterface.php';
-require_once dirname(__FILE__,3) . '/vendor/pdf-version-converter-1.0.5/src/Guesser/RegexGuesser.php';
-require_once dirname(__FILE__,3) . '/vendor/symfony/process/Process.php';
-require_once dirname(__FILE__,3) . '/vendor/symfony/process/ProcessUtils.php';
-require_once dirname(__FILE__,3) . '/vendor/symfony/process/Pipes/PipesInterface.php';
-require_once dirname(__FILE__,3) . '/vendor/symfony/process/Pipes/AbstractPipes.php';
-require_once dirname(__FILE__,3) . '/vendor/symfony/process/Pipes/UnixPipes.php';
-require_once dirname(__FILE__,3) . '/vendor/symfony/filesystem/Filesystem.php';
-require_once dirname(__FILE__,3) . '/vendor/fpdf_merge/fpdf_merge.php';
+// require_once dirname(__FILE__,3) . '/vendor/php-pdf-merge/src/Jurosh/PDFMerge/PDFObject.php';
+// require_once dirname(__FILE__,3) . '/vendor/php-pdf-merge/src/Jurosh/PDFMerge/PDFMerger.php';
+// require_once dirname(__FILE__,3) . '/vendor/pdf-version-converter-1.0.5/src/Converter/ConverterInterface.php';
+// require_once dirname(__FILE__,3) . '/vendor/pdf-version-converter-1.0.5/src/Converter/GhostscriptConverter.php';
+// require_once dirname(__FILE__,3) . '/vendor/pdf-version-converter-1.0.5/src/Converter/GhostscriptConverterCommand.php';
+// require_once dirname(__FILE__,3) . '/vendor/pdf-version-converter-1.0.5/src/Guesser/GuesserInterface.php';
+// require_once dirname(__FILE__,3) . '/vendor/pdf-version-converter-1.0.5/src/Guesser/RegexGuesser.php';
+// require_once dirname(__FILE__,3) . '/vendor/symfony/process/Process.php';
+// require_once dirname(__FILE__,3) . '/vendor/symfony/process/ProcessUtils.php';
+// require_once dirname(__FILE__,3) . '/vendor/symfony/process/Pipes/PipesInterface.php';
+// require_once dirname(__FILE__,3) . '/vendor/symfony/process/Pipes/AbstractPipes.php';
+// require_once dirname(__FILE__,3) . '/vendor/symfony/process/Pipes/UnixPipes.php';
+// require_once dirname(__FILE__,3) . '/vendor/symfony/filesystem/Filesystem.php';
+// require_once dirname(__FILE__,3) . '/vendor/fpdf_merge/fpdf_merge.php';
+require_once dirname(__FILE__,3) . '/vendor/TCPDF-main/tcpdf.php';
+require_once dirname(__FILE__,3) . '/vendor/tcpdi-master/tcpdi.php';
+require_once dirname(__FILE__,3) . '/vendor/tcpdi-merger-master/src/MyTCPDI.php';
+require_once dirname(__FILE__,3) . '/vendor/tcpdi-merger-master/src/Merger.php';
 
 // import the namespaces
 use Symfony\Component\Filesystem\Filesystem;
@@ -57,15 +61,16 @@ class apiPDF {
 			// Initialize PDF
 			$dir = pathinfo($files[0])['dirname'];
 			$filename = $dir.'/'.time().'.pdf';
-			$pdf = new FPDF_Merge();
+			$pdf = new Merger(true);
 			foreach($files as $file){
 				if(strpos(strtolower($file), '.pdf') !== false){
 					echo $file."\n";
-					$pdf->add($file);
+					$pdf->addFromFile($file);
 				}
 			}
 			echo $filename;
-			return $pdf->output($filename);
+			$this->errors[] =  $pdf->merge();
+			return $pdf->save($filename);
 		} else { $this->errors[] =  "No Files!"; }
 	}
 
