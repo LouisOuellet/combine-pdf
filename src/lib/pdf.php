@@ -63,8 +63,8 @@ class apiPDF {
 					$cmd .= $file." ";
 				}
 			}
-			// echo $cmd;
 			return shell_exec($cmd);
+			echo $cmd;
 		} else { $this->errors[] =  "No Files!"; }
 	}
 
