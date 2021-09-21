@@ -19,7 +19,7 @@ require_once dirname(__FILE__,3) . '/vendor/symfony/process/Pipes/PipesInterface
 require_once dirname(__FILE__,3) . '/vendor/symfony/process/Pipes/AbstractPipes.php';
 require_once dirname(__FILE__,3) . '/vendor/symfony/process/Pipes/UnixPipes.php';
 require_once dirname(__FILE__,3) . '/vendor/symfony/filesystem/Filesystem.php';
-require_once dirname(__FILE__,3) . '/vendor/FPDF_Merge-master/FPDF_Merge.php';
+require_once dirname(__FILE__,3) . '/vendor/fpdf_merge/fpdf_merge.php';
 
 // import the namespaces
 use Symfony\Component\Filesystem\Filesystem;
@@ -60,7 +60,7 @@ class apiPDF {
 			$pdf = new FPDF_Merge();
 			foreach($files as $file){
 				if(strpos(strtolower($file), '.pdf') !== false){
-					echo $file."<br>\n";
+					echo $file."\n";
 					$pdf->add($file);
 				}
 			}
