@@ -48,6 +48,7 @@ sudo systemctl start php-pdf
  - ghostscript
  - imagegick
  - imagegick-common
+ - qpdf
 
 ### Execute
 

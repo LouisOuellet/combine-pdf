@@ -24,14 +24,14 @@
 // require_once dirname(__FILE__,3) . '/vendor/tcpdi-master/tcpdi.php';
 // require_once dirname(__FILE__,3) . '/vendor/tcpdi-merger-master/src/MyTCPDI.php';
 // require_once dirname(__FILE__,3) . '/vendor/tcpdi-merger-master/src/Merger.php';
-require_once dirname(__FILE__,3) . '/vendor/PDFMerger-master/PDFMerger.php';
+// require_once dirname(__FILE__,3) . '/vendor/PDFMerger-master/PDFMerger.php';
 
 // import the namespaces
 // use Symfony\Component\Filesystem\Filesystem;
 // use Xthiago\PDFVersionConverter\Guesser\RegexGuesser;
 // use Xthiago\PDFVersionConverter\Converter\GhostscriptConverterCommand;
 // use Xthiago\PDFVersionConverter\Converter\GhostscriptConverter;
-use PDFMerger\PDFMerger;
+// use PDFMerger\PDFMerger;
 
 class apiPDF {
 
@@ -58,15 +58,19 @@ class apiPDF {
 			// Initialize PDF
 			$dir = pathinfo($files[0])['dirname'];
 			$filename = $dir.'/'.time().'.pdf';
-			$pdf = new PDFMerger();
+			$cmd = "convert ";
 			foreach($files as $file){
 				if(strpos(strtolower($file), '.pdf') !== false){
 					echo $file."\n";
-					$pdf->addPDF($file,'all');
+					$decrypted = str_replace('.pdf','-decrypted.pdf',$file);
+					shell_exec("qpdf --decrypt $file $decrypted");
+					$cmd .= $decrypted." ";
 				}
 			}
-			echo $filename;
-			return  $pdf->merge('file', $filename);
+			echo $cmd."\n";
+			echo $filename."\n";
+			shell_exec($cmd." $filename");
+			return $filename;
 		} else { $this->errors[] =  "No Files!"; }
 	}
 
