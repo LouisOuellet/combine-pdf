@@ -59,6 +59,7 @@ class apiPDF {
 			$cmd = "gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=$filename ";
 			foreach($files as $file){
 				if(strpos(strtolower($file), '.pdf') !== false){
+					echo $file."<br>\n";
 					$cmd .= $file." ";
 				}
 			}
