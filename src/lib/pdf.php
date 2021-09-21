@@ -1,11 +1,11 @@
 <?php
 
 // Import Librairies
-require_once dirname(__FILE__,3) . '/vendor/fpdf183/fpdf.php';
-require_once dirname(__FILE__,3) . '/vendor/FPDI-2.3.6/src/FpdiException.php';
-require_once dirname(__FILE__,3) . '/vendor/FPDI-2.3.6/src/PdfParser/PdfParserException.php';
-require_once dirname(__FILE__,3) . '/vendor/FPDI-2.3.6/src/PdfParser/CrossReference/CrossReferenceException.php';
-require_once dirname(__FILE__,3) . '/vendor/FPDI-2.3.6/src/autoload.php';
+// require_once dirname(__FILE__,3) . '/vendor/fpdf183/fpdf.php';
+// require_once dirname(__FILE__,3) . '/vendor/FPDI-2.3.6/src/FpdiException.php';
+// require_once dirname(__FILE__,3) . '/vendor/FPDI-2.3.6/src/PdfParser/PdfParserException.php';
+// require_once dirname(__FILE__,3) . '/vendor/FPDI-2.3.6/src/PdfParser/CrossReference/CrossReferenceException.php';
+// require_once dirname(__FILE__,3) . '/vendor/FPDI-2.3.6/src/autoload.php';
 // require_once dirname(__FILE__,3) . '/vendor/php-pdf-merge/src/Jurosh/PDFMerge/PDFObject.php';
 // require_once dirname(__FILE__,3) . '/vendor/php-pdf-merge/src/Jurosh/PDFMerge/PDFMerger.php';
 // require_once dirname(__FILE__,3) . '/vendor/pdf-version-converter-1.0.5/src/Converter/ConverterInterface.php';
