@@ -126,6 +126,7 @@ class apiPDF {
 
 	protected function getNbrPages($file){
 		if(file_exists($file)){
+			var_dump($file);
 			$imagick = new Imagick($file);
 			return $imagick->getNumberImages();
 		} else { $this->errors[] =  $file." could not be found"; }
