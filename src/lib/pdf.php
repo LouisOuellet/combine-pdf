@@ -20,10 +20,11 @@
 // require_once dirname(__FILE__,3) . '/vendor/symfony/process/Pipes/UnixPipes.php';
 // require_once dirname(__FILE__,3) . '/vendor/symfony/filesystem/Filesystem.php';
 // require_once dirname(__FILE__,3) . '/vendor/fpdf_merge/fpdf_merge.php';
-require_once dirname(__FILE__,3) . '/vendor/TCPDF-main/tcpdf.php';
-require_once dirname(__FILE__,3) . '/vendor/tcpdi-master/tcpdi.php';
-require_once dirname(__FILE__,3) . '/vendor/tcpdi-merger-master/src/MyTCPDI.php';
-require_once dirname(__FILE__,3) . '/vendor/tcpdi-merger-master/src/Merger.php';
+// require_once dirname(__FILE__,3) . '/vendor/TCPDF-main/tcpdf.php';
+// require_once dirname(__FILE__,3) . '/vendor/tcpdi-master/tcpdi.php';
+// require_once dirname(__FILE__,3) . '/vendor/tcpdi-merger-master/src/MyTCPDI.php';
+// require_once dirname(__FILE__,3) . '/vendor/tcpdi-merger-master/src/Merger.php';
+require_once dirname(__FILE__,3) . '/vendor/PDFMerger-master/PDFMerger.php';
 
 // import the namespaces
 use Symfony\Component\Filesystem\Filesystem;
@@ -49,11 +50,6 @@ class apiPDF {
 		}
 	}
 
-	public function version($file){
-		$guesser = new RegexGuesser();
-		return floatval($guesser->guess($file));
-	}
-
 	public function merge($files, $size = null){
 		if($size == null || !is_numeric($size)){ $size = $this->maxFileSize; }
 		// Verifications
@@ -61,16 +57,15 @@ class apiPDF {
 			// Initialize PDF
 			$dir = pathinfo($files[0])['dirname'];
 			$filename = $dir.'/'.time().'.pdf';
-			$pdf = new Merger(true);
+			$pdf = new PDFMerger();
 			foreach($files as $file){
 				if(strpos(strtolower($file), '.pdf') !== false){
 					echo $file."\n";
-					$pdf->addFromFile($file);
+					$pdf->addPDF($file,'all');
 				}
 			}
 			echo $filename;
-			$this->errors[] =  $pdf->merge();
-			return $pdf->save($filename);
+			return  $pdf->merge('file', $filename);
 		} else { $this->errors[] =  "No Files!"; }
 	}
 
@@ -148,6 +143,11 @@ class apiPDF {
 	}
 
 	// Helpers
+
+	public function version($file){
+		$guesser = new RegexGuesser();
+		return floatval($guesser->guess($file));
+	}
 
 	protected function getNbrPages($file){
 		if(file_exists($file)){
