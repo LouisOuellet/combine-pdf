@@ -27,10 +27,11 @@
 require_once dirname(__FILE__,3) . '/vendor/PDFMerger-master/PDFMerger.php';
 
 // import the namespaces
-use Symfony\Component\Filesystem\Filesystem;
-use Xthiago\PDFVersionConverter\Guesser\RegexGuesser;
-use Xthiago\PDFVersionConverter\Converter\GhostscriptConverterCommand;
-use Xthiago\PDFVersionConverter\Converter\GhostscriptConverter;
+// use Symfony\Component\Filesystem\Filesystem;
+// use Xthiago\PDFVersionConverter\Guesser\RegexGuesser;
+// use Xthiago\PDFVersionConverter\Converter\GhostscriptConverterCommand;
+// use Xthiago\PDFVersionConverter\Converter\GhostscriptConverter;
+use PDFMerger\PDFMerger;
 
 class apiPDF {
 
