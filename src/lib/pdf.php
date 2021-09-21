@@ -49,6 +49,23 @@ class apiPDF {
 		return floatval($guesser->guess($file));
 	}
 
+	public function merge($files, $size = null){
+		f($size == null || !is_numeric($size)){ $size = $this->maxFileSize; }
+		// Verifications
+		if(is_array($files) && count($files) > 0){
+			// Initialize PDF
+			$dir = pathinfo($files[0])['dirname'];
+			$filename = $dir.'/'.time().'.pdf';
+			$cmd = "gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=$filename ";
+			foreach($files as $file){
+				if(strpos(strtolower($file), '.pdf') !== false){
+					$cmd .= $file." ";
+				}
+			}
+			return shell_exec($cmd);
+		} else { $this->errors[] =  "No Files!"; }
+	}
+
 	public function combine($files, $size = null){
 		if($size == null || !is_numeric($size)){ $size = $this->maxFileSize; }
 		// Initialize PDF
@@ -189,7 +206,8 @@ class apiPDF {
 				$imagick->setResolution($this->DPI,$this->DPI);
 				if(!$imagick->readImage($file."[".$page."]")){ $this->errors[] =  "Unable to read ".$file."[".$page."]"; }
 				$imagick->setImageFormat($format);
-				$imagick->setImageDepth(32); // TesseractOCR 8
+				$imagick->setImageDepth(8); // TesseractOCR 8
+				$imagick = $imagick->flattenImages();
 				$filename = str_replace('.pdf','-'.$page.'.'.$format,$file);
 				if(!$imagick->writeImage($filename)){ $this->errors[] =  "Unable to write ".$filename; }
 				$imagick->destroy();
