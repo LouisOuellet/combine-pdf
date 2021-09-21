@@ -50,7 +50,7 @@ class apiPDF {
 	}
 
 	public function merge($files, $size = null){
-		f($size == null || !is_numeric($size)){ $size = $this->maxFileSize; }
+		if($size == null || !is_numeric($size)){ $size = $this->maxFileSize; }
 		// Verifications
 		if(is_array($files) && count($files) > 0){
 			// Initialize PDF
