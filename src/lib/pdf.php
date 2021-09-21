@@ -32,14 +32,11 @@ class apiPDF {
 			$cmd = "convert ";
 			foreach($files as $file){
 				if(strpos(strtolower($file), '.pdf') !== false){
-					echo $file."\n";
 					$decrypted = str_replace('.pdf','-decrypted.pdf',$file);
 					shell_exec("qpdf --decrypt $file $decrypted");
 					$cmd .= $decrypted." ";
 				}
 			}
-			echo $cmd."\n";
-			echo $filename."\n";
 			shell_exec($cmd." $filename");
 			return $filename;
 		} else { $this->errors[] =  "No Files!"; }
