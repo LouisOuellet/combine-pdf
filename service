@@ -3,7 +3,8 @@
 sourceDir=$(dirname $(readlink -f $0))
 
 while(true);do
-  php ${sourceDir}/service.php
+  php ${sourceDir}/combine.php
+  # php ${sourceDir}/service.php
   if [ -f "${sourceDir}/tmp" ]; then
     rm -r ${sourceDir}/tmp
   fi
