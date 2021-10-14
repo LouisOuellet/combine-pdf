@@ -56,7 +56,7 @@ class apiPDF{
 		}
 
 		// Generate Name
-		if($filename == null){ $file = trim($destDIR,'/').'/'.time().'.pdf'; }
+		if($filename == null){ $file = '/'.trim($destDIR,'/').'/'.time().'.pdf'; }
 		else{ $file = '/'.trim($destDIR,'/').'/'.$filename.'.pdf'; }
 
 		// Save Locally
