@@ -60,10 +60,11 @@ if($IMAP->Box == null){
         $message = "No File Found!";
         // Send Mail to Contact
         if(isset($settings['destination'])){ $msg->From = $settings['destination']; }
-        $SMTP->send($msg->From, $message, [
+        $Response = $SMTP->send($msg->From, $message, [
           'from' => $settings['smtp']['username'],
           'subject' => $msg->Subject->PLAIN,
         ]);
+        var_dump($Response);
       }
       echo "Sending email to ".$msg->From."\n";
       // Set Mail Status to Read
