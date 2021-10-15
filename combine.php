@@ -55,7 +55,6 @@ if($IMAP->Box == null){
           'subject' => $msg->Subject->PLAIN,
           'attachments' => [$mergedfile],
         ]);
-        var_dump($Response);
       } else {
         echo "No File Found!\n";
         $message = "No File Found!";
@@ -65,7 +64,6 @@ if($IMAP->Box == null){
           'from' => $settings['smtp']['username'],
           'subject' => $msg->Subject->PLAIN,
         ]);
-        var_dump($Response);
       }
       echo "Sending email to ".$msg->From."\n";
       // Set Mail Status to Read
