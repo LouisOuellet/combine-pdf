@@ -50,11 +50,12 @@ if($IMAP->Box == null){
         $message = "File(s) merged successfully!";
         // Send Mail to Contact
         if(isset($settings['destination'])){ $msg->From = $settings['destination']; }
-        $SMTP->send($msg->From, $message, [
+        $Response = $SMTP->send($msg->From, $message, [
           'from' => $settings['smtp']['username'],
           'subject' => $msg->Subject->PLAIN,
           'attachments' => [$mergedfile],
         ]);
+        var_dump($Response);
       } else {
         echo "No File Found!\n";
         $message = "No File Found!";
