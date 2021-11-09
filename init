@@ -13,19 +13,19 @@ sourceDir=$(dirname $(readlink -f $0))
 case "$1" in
 start)
    ${sourceDir}/service &
-   echo $!>/var/run/service.pid
+   echo $!>${sourceDir}/tmp/service.pid
    ;;
 stop)
-   kill `cat /var/run/service.pid`
-   rm /var/run/service.pid
+   kill `cat ${sourceDir}/tmp/service.pid`
+   rm ${sourceDir}/tmp/service.pid
    ;;
 restart)
    $0 stop
    $0 start
    ;;
 status)
-   if [ -e /var/run/service.pid ]; then
-      echo service is running, pid=`cat /var/run/service.pid`
+   if [ -e ${sourceDir}/tmp/service.pid ]; then
+      echo service is running, pid=`cat ${sourceDir}/tmp/service.pid`
    else
       echo service is NOT running
       exit 1
