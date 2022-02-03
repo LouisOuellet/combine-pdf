@@ -28,7 +28,7 @@ class apiIMAP{
 					$msg = imap_headerinfo($this->Box,$msgid);
 					$msg->ID = $msgid;
 					$msg->UID = imap_uid($this->Box,$msgid);
-					$msg->Header = imap_header($this->Box,$msgid);
+					$msg->Header = imap_headerinfo($this->Box,$msgid);
 					$msg->From = $msg->Header->from[0]->mailbox . "@" . $msg->Header->from[0]->host;
 					if(!property_exists($msg,'Subject')){ $msg->Subject = ""; }
 					$sub = $msg->Subject;
