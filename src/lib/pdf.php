@@ -26,7 +26,7 @@ use Xthiago\PDFVersionConverter\Guesser\RegexGuesser;
 use Xthiago\PDFVersionConverter\Converter\GhostscriptConverterCommand;
 use Xthiago\PDFVersionConverter\Converter\GhostscriptConverter;
 
-class apiPDF{
+class phpPDF{
 
 	public function __construct(){}
 

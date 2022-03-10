@@ -1,5 +1,15 @@
+composer.phar
+*composer.phar
 .DS_Store
 *.DS_Store
-settings.json
 /tmp/
 /tmp/*
+*/tmp/
+*/tmp/*
+!/tmp/.htaccess
+/data/*
+/error/
+/stats/
+/error/*
+/stats/*
+robots.txt
