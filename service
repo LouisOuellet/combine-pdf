@@ -4,8 +4,8 @@ sourceDir=$(dirname $(readlink -f $0))
 
 while(true);do
   php ${sourceDir}/app.php
-  if [ -f "${sourceDir}/tmp" ]; then
-    rm -r ${sourceDir}/tmp
+  if [ -f "${sourceDir}/tmp/imap" ]; then
+    rm -r ${sourceDir}/tmp/imap
   fi
   sleep 5m
 done
