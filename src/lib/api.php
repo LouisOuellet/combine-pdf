@@ -44,7 +44,6 @@ class API{
     $this->log("====================================================");
     $this->log("  Log ".date("Y-m-d H:i:s")."");
     $this->log("====================================================");
-    $this->log("\n");
 
 		//Import Listings
     $this->Timezones = json_decode(file_get_contents(dirname(__FILE__,3) . '/dist/data/timezones.json'),true);
