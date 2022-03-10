@@ -1,7 +1,7 @@
 # PHP PDF
 PHP application to combine multiple PDF files into one. It also support compressions if your recipient does not support files above a certain size. This application does not yet support Compact PDF. It uses different techniques to reduce the size of your PDF file such as removing all OCR and converting all pages to simple images.
 
-## Updates
+## ChangeLog
 
  * [2022-03-10]: A new logging system has been added.
  * [2022-03-10]: Additional configurations have been added.
@@ -71,7 +71,8 @@ or
 To create the file simply use your favorite editor and copy/paste the example.
 
 ```BASH
-nano settings.json
+mkdir config
+nano config/config.json
 ```
 
  - smtp[MANDATORY]: contains the SMTP configurations
