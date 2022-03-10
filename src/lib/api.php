@@ -106,7 +106,7 @@ class API{
     exit();
   }
 
-  protected function log($txt){
+  protected function log($txt = " "){
     if($this->Debug){ echo $txt."\n"; }
     if(isset($this->Settings['log']['status']) && $this->Settings['log']['status']){
       return file_put_contents($this->Log, $txt.PHP_EOL , FILE_APPEND | LOCK_EX);
