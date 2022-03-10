@@ -9,10 +9,6 @@ PHP application to combine multiple PDF files into one. It also support compress
  * [2022-03-10]: Configuration file moved from settings.json to config/config.json.
  * [2022-03-10]: Added support for languages. Currently English and Francais only. But additional one can be created in dist/languages/.
  * [2022-03-10]: Added support for timezones.
- * [2022-03-10]:
- * [2022-03-10]:
- * [2022-03-10]:
- * [2022-03-10]:
 
 ## Planned
 
