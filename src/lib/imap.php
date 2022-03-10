@@ -10,7 +10,7 @@ class PHPIMAP{
 	protected $Username;
 	protected $Password;
 	protected $Connection;
-	protected $this->IMAP;
+	protected $IMAP;
 
 	public $Status = false;
 	public $Folders = [];
