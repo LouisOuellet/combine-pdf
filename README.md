@@ -71,7 +71,8 @@ or
 To create the file simply use your favorite editor and copy/paste the example.
 
 ```BASH
-nano settings.json
+mkdir config
+nano config/config.json
 ```
 
  - smtp[MANDATORY]: contains the SMTP configurations
