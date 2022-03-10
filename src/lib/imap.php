@@ -59,7 +59,7 @@ class PHPIMAP{
 		if(!imap_open($connection, $username, $password)){ return false; } else { return true; }
 	}
 
-	protected formatMsgs($ids = []){
+	protected function formatMsgs($ids = []){
 		$messages = [];
 		foreach($ids as $id){
 			// Handling Meta Data
