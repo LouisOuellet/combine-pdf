@@ -29,8 +29,9 @@ class Application extends API{
           "subject" => $msg->Subject->Full,
           "body" => $msg->Body->Content,
           "date" => date('Y-m-d H:i:s',strtotime($msg->Date)),
-          "attachments" => []
         ];
+        if(isset($eml['attachments'])){ unset($eml['attachments']); }
+        $eml['attachments'] = [];
         // Saving Attachments
         $this->log($this->Fields['Saving Attachments']);
         foreach($msg->Attachments->Files as $file){
