@@ -15,7 +15,7 @@ class API{
   protected $PHPVersion;
   protected $Auth;
   protected $PDF;
-  protected $Debug = true;
+  protected $Debug = false;
   protected $Log = "tmp/php-pdf.log";
 
   public function __construct(){
