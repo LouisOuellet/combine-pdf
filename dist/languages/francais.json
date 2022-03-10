@@ -1,0 +1,19 @@
+{
+    "Opening Mailbox ": "Ouvrir la boîte aux lettres ",
+    "Reading Mailbox ": "Lecture de la boîte aux lettres ",
+    "Unable to connect to IMAP server": "Impossible de se connecter au serveur IMAP",
+    "Looking at message": "Consultation du message",
+    "Saving ": "Enregistrement de ",
+    "Saving Attachments": "Sauvegarde des pièces jointes",
+    "Merging Attachments": "Fusionner les pièces jointes",
+    "Merged File: ": "Fichier fusionné: ",
+    "Unable to connect to SMTP server": "Impossible de se connecter au serveur SMTP",
+    "Sending email to ": "Envoi d'un courriel à ",
+    "Unable to send email to ": "Impossible d'envoyer un email à ",
+    "Deleting email ": "Suppression de l'email ",
+    "Unable to delete the email ": "Impossible de supprimer l'email ",
+    "Email sent to ": "Email envoyé à ",
+    "Email Deleted ": "Email supprimé ",
+    "No File Found!": "Aucun fichier trouvé!",
+    "File(s) merged successfully!": "Fichier(s) fusionné(s) avec succès!"
+}

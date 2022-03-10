@@ -89,7 +89,18 @@ nano settings.json
 ### Example
 ```JSON
 {
+    "debug": false,
+    "timezone": "America\/Toronto",
+    "language": "english",
     "destination": "default@domain.com",
+    "log": {
+        "status": "enable",
+        "file": "tmp/php-pdf.log"
+    },
+    "attachments": {
+        "merge": false,
+        "pattern": "/^md10013/i"
+    },
     "smtp":{
         "host": "smtp.domain.com",
         "port": "465",
