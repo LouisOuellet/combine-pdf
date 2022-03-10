@@ -110,6 +110,7 @@ class MAIL{
 		else { $this->Mailer->setFrom($this->Mailer->Username, $this->Brand); }
 		if(isset($extra['replyto'])){ $this->Mailer->addReplyTo($extra['replyto']); }
 		$this->Mailer->addAddress($email);
+		$this->Mailer->clearAttachments();
 		if((isset($extra['attachments']))&&(is_array($extra['attachments']))){
 			foreach($extra['attachments'] as $attachment){
 				$this->Mailer->addAttachment($attachment);
