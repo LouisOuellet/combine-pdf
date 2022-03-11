@@ -9,7 +9,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\SMTP;
 
-class MAIL{
+class MAILER{
 
 	public $Mailer; // Contains the PHPMailer Class
 	public $Status = false;

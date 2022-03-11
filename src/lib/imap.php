@@ -2,11 +2,8 @@
 
 // Import Librairies
 
-class PHPIMAP{
+class IMAP{
 
-	protected $Host;
-	protected $Port;
-	protected $Encryption;
 	protected $Username;
 	protected $Password;
 	protected $Connection;
@@ -15,59 +12,39 @@ class PHPIMAP{
 	public $Status = false;
 	public $Folders = [];
 
-	public function __construct($Host = null,$Port = null,$Encryption = null,$Username = null,$Password = null,$isSelfSigned = true){
+	public function __construct($host = null,$port = null,$encyption = null,$username = null,$password = null,$isSelfSigned = true){
 
     // Increase PHP memory limit
     ini_set('memory_limit', '2G');
     ini_set('max_execution_time',0);
 
-		// Save Configuration
-		$this->Host = $Host;
-		$this->Port = $Port;
-		$this->Encryption = $Encryption;
-		$this->Username = $Username;
-		$this->Password = $Password;
-		$this->isSelfSigned = $isSelfSigned;
-
 		// Setup Connection
-		$Connection = '{'.$Host.':'.$Port.'/imap/'.strtolower($Encryption);
-		if($isSelfSigned){ $Connection .= '/novalidate-cert'; }
-		$Connection .= '}';
-		$this->Connection = $Connection;
-
-		// Test Connection
-		error_reporting(0);
-		if(!$this->IMAP = imap_open($Connection, $Username, $Password)){
-			$this->Status = end(imap_errors());
-		} else {
-			$this->Status = true;
-			$this->Connection = $Connection;
-			error_reporting(-1);
-			$folders = imap_list($this->IMAP, $Connection, "*");
-			if(is_array($folders)){ foreach($folders as $folder){ array_push($this->Folders,str_replace($Connection,'',imap_utf7_decode($folder))); } }
-			// Close IMAP Connection
-			imap_close($this->IMAP);
+		if($host != null){
+			$connection = $this->buildConnectionString($host,$port,$encyption,$isSelfSigned);
+			$this->connect($username,$password,$connection,true);
 		}
 	}
 
-	public function login($username,$password,$host,$port,$encryption = null,$isSelfSigned = true){
-		// Setup Connection
-		$connection = '{'.$host.':'.$port.'/imap/'.strtolower($encryption);
-		if($isSelfSigned){ $connection .= '/novalidate-cert'; }
-		$connection .= '}';
+	public function __destruct(){ $this->close(); }
 
-		// Test Connection
-		if(!imap_open($connection, $username, $password)){ return false; } else { return true; }
+	public function login($username,$password,$host = null,$port = null,$encryption = null,$isSelfSigned = true){
+		// Setup Connection
+		if($host == null){ $connection = null; } else { $connection = $this->buildConnectionString($host,$port,$encyption,$isSelfSigned); }
+		if($IMAP = $this->connect($username,$password,$connection)){
+			$this->close($IMAP);
+			return true;
+		} else { return false; }
 	}
 
-	protected function formatMsgs($ids = []){
+	protected function formatMsgs($ids = [], $IMAP = null){
+		if($IMAP == null){ $IMAP = $this->IMAP; }
 		$messages = [];
 		foreach($ids as $id){
 			// Handling Meta Data
-			$msg = imap_headerinfo($this->IMAP,$id);
+			$msg = imap_headerinfo($IMAP,$id);
 			$msg->ID = $id;
-			$msg->UID = imap_uid($this->IMAP,$id);
-			$msg->Header = imap_headerinfo($this->IMAP,$id);
+			$msg->UID = imap_uid($IMAP,$id);
+			$msg->Header = imap_headerinfo($IMAP,$id);
 			$msg->Date = $msg->Header->date;
 			$msg->From = $msg->Header->from[0]->mailbox . "@" . $msg->Header->from[0]->host;
 			$msg->Sender = $msg->Header->sender[0]->mailbox . "@" . $msg->Header->sender[0]->host;
@@ -115,8 +92,8 @@ class PHPIMAP{
 			}
 			// Handling Body
 			$msg->Body = new stdClass();
-			$msg->Body->Meta = imap_fetchstructure($this->IMAP,$id);
-			$msg->Body->Content = $this->getBody($this->IMAP,$msg->UID);
+			$msg->Body->Meta = imap_fetchstructure($IMAP,$id);
+			$msg->Body->Content = $this->getBody($IMAP,$msg->UID);
 			if($this->isHTML($msg->Body->Content)){
 				$htmlBody = $this->convertHTMLSymbols($msg->Body->Content);
 				$html = new DOMDocument();
@@ -193,7 +170,7 @@ class PHPIMAP{
 					}
 					if((isset($msg->Attachments->Files[$key]))&&($msg->Attachments->Files[$key]['is_attachment'])){
 						$msg->Attachments->Count++;
-						$msg->Attachments->Files[$key]['attachment'] = imap_fetchbody($this->IMAP,$id, $objects['part_number']);
+						$msg->Attachments->Files[$key]['attachment'] = imap_fetchbody($IMAP,$id, $objects['part_number']);
 						$msg->Attachments->Files[$key]['encoding'] = $part->encoding;
 						if(isset($part->bytes)){$msg->Attachments->Files[$key]['bytes'] = $part->bytes;}
 						if($part->encoding == 3){
@@ -206,60 +183,69 @@ class PHPIMAP{
 			}
 			$messages[$msg->ID] = $msg;
 			// Resetting Flag
-			if(isset($opt["new"]) && is_bool($opt["new"]) && $opt["new"]){ imap_clearflag_full($this->IMAP,$id, "\\Seen"); }
+			if(isset($opt["new"]) && is_bool($opt["new"]) && $opt["new"]){ imap_clearflag_full($IMAP,$id, "\\Seen"); }
 		}
 		return $messages;
 	}
 
-	public function search($criteria = "ALL", $folder = "INBOX", $opt = []){
-		if(is_array($folder)){ $opt = $folder;$folder = "INBOX"; }
+	protected function changeFolder($folder, $IMAP = null){
+		if($IMAP == null){ $IMAP = $this->IMAP; }
+		$meta = imap_mailboxmsginfo($IMAP);
+		$connection = substr($meta->Mailbox, 0, strpos($meta->Mailbox, "}")+1);
+		if($IMAP != $this->IMAP){
+			$folders = [];
+			$lists = imap_list($this->IMAP, $this->Connection, "*");
+			if(is_array($lists)){ foreach($lists as $folder){ array_push($folders,str_replace($connection,'',imap_utf7_decode($list))); } }
+		} else { $folders = $this->Folders; }
+		if(in_array($folder, $folders)){ imap_reopen($IMAP, $connection.$folder); }
+		return $IMAP;
+	}
+
+	public function search($criteria = "ALL", $IMAP = null, $opt = []){
+		if(is_array($IMAP)){ $opt = $IMAP;$IMAP = null; }
+		if($IMAP == null){ $IMAP = $this->IMAP; }
+		if(isset($opt['folder'])){ $folder = $opt['folder']; } else { $folder = "INBOX"; }
 		if($this->isConnected()){
 			// Init Return
 			$return = new stdClass();
 			// Connect to Folder
-			if(in_array($folder, $this->Folders) && $this->IMAP = imap_open($this->Connection.$folder, $this->Username, $this->Password)){
-				// Building Meta Data
-				$return->Meta = imap_check($this->IMAP);
-				$return->Meta->All = imap_num_msg($this->IMAP);
-				$new = imap_search($this->IMAP, $criteria.' UNSEEN');
-				if(is_array($new)){ $return->Meta->Recent = count($new); } else { $return->Meta->Recent = 0; }
-				$ids = imap_search($this->IMAP, $criteria);
-				$return->messages = [];
-				if(!empty($ids)){
-					$return->messages = $this->formatMsgs($ids);
-				}
-				// Close IMAP Connection
-				imap_close($this->IMAP);
-				// Return
-				return $return;
-			} else { return end(imap_errors()); }
+			$IMAP = $this->changeFolder($folder,$IMAP);
+			// Meta Data
+			$return->Meta = imap_mailboxmsginfo($IMAP);
+			// Get Messages
+			$ids = imap_search($IMAP, $criteria);
+			$return->messages = [];
+			if(!empty($ids)){
+				$return->messages = $this->formatMsgs($ids, $IMAP);
+			}
+			// Close IMAP Connection
+			$this->close($IMAP);
+			// Return
+			return $return;
 		} else { return $this->Status; }
 	}
 
-	public function get($folder = "INBOX", $opt = []){
-		if(is_array($folder)){ $opt = $folder;$folder = "INBOX"; }
+	public function get($IMAP = null, $opt = []){
+		if(is_array($IMAP)){ $opt = $IMAP;$IMAP = null; }
+		if($IMAP == null){ $IMAP = $this->IMAP; }
+		if(isset($opt['folder'])){ $folder = $opt['folder']; } else { $folder = "INBOX"; }
 		if($this->isConnected()){
 			// Init Return
 			$return = new stdClass();
 			// Connect to Folder
-			error_reporting(0);
-			if(in_array($folder, $this->Folders) && $this->IMAP = imap_open($this->Connection.$folder, $this->Username, $this->Password)){
-				error_reporting(-1);
-				// Building Meta Data
-				$return->Meta = imap_check($this->IMAP);
-				$return->Meta->All = imap_num_msg($this->IMAP);
-				$new = imap_search($this->IMAP, 'UNSEEN');
-				if(is_array($new)){ $return->Meta->Recent = count($new); } else { $return->Meta->Recent = 0; }
-				$ids = imap_search($this->IMAP,"ALL");
-				$return->messages = [];
-				if(!empty($ids)){
-					$return->messages = $this->formatMsgs($ids);
-				}
-				// Close IMAP Connection
-				imap_close($this->IMAP);
-				// Return
-				return $return;
-			} else { return end(imap_errors()); }
+			$IMAP = $this->changeFolder($folder,$IMAP);
+			// Meta Data
+			$return->Meta = imap_mailboxmsginfo($IMAP);
+			// Get Messages
+			$ids = imap_search($IMAP,"ALL");
+			$return->messages = [];
+			if(!empty($ids)){
+				$return->messages = $this->formatMsgs($ids, $IMAP);
+			}
+			// Close IMAP Connection
+			$this->close($IMAP);
+			// Return
+			return $return;
 		} else { return $this->Status; }
 	}
 
@@ -267,43 +253,87 @@ class PHPIMAP{
 		return is_bool($this->Status) && $this->Status ? true:false;
 	}
 
-	public function read($uid){
-		// Connect IMAP
-		$this->IMAP = imap_open($this->Connection, $this->Username, $this->Password);
+	public function read($uid,$IMAP = null){
+		if($IMAP == null){ $IMAP = $this->IMAP; }
 		// Read Message
-		imap_body($this->IMAP,$uid,FT_UID);
+		imap_body($IMAP,$uid,FT_UID);
 		// Close IMAP Connection
-		imap_close($this->IMAP);
+		$this->close($IMAP);
 	}
 
-	public function saveEml($uid){
+	public function close($IMAP = null){
+		if($IMAP == null){
+			if($this->Status){ imap_close($this->IMAP); }
+		} elseif($IMAP != $this->IMAP) { imap_close($IMAP); }
+	}
+
+	public function connect($username = null,$password = null,$connection = null,$store = false){
+		// Setup Connection String
+		if($connection == null){ $connection = $this->Connection; }
+		if($password == null){ $password = $this->Password; }
+		if($username == null){ $username = $this->Username; }
 		// Connect IMAP
 		error_reporting(0);
-		if($this->IMAP = imap_open($this->Connection, $this->Username, $this->Password)){
+		if($IMAP = imap_open($connection, $username, $password)){
 			error_reporting(-1);
-			// Fetch Email
-			$headers = imap_fetchheader($this->IMAP, $uid, FT_UID);
-			$body = imap_body($this->IMAP, $uid, FT_UID);
-			// Close IMAP Connection
-			imap_close($this->IMAP);
-			// Return Blob
-			return $headers."\n".$body;
+			if($store){
+				$this->Connection = $connection;
+				$this->Username = $username;
+				$this->Password = $password;
+				$this->IMAP = $IMAP;
+				$this->Status = true;
+				$this->Folders = [];
+				$folders = imap_list($this->IMAP, $this->Connection, "*");
+				if(is_array($folders)){ foreach($folders as $folder){ array_push($this->Folders,str_replace($connection,'',imap_utf7_decode($folder))); } }
+				return true;
+			} else { return $IMAP; }
 		} else { error_reporting(-1);return false; }
 	}
 
-	public function delete($uid){
-		// Connect IMAP
-		error_reporting(0);
-		if($this->IMAP = imap_open($this->Connection, $this->Username, $this->Password)){
-			error_reporting(-1);
-			// Delete Email
-			imap_mail_copy($this->IMAP,$uid,'Trash',FT_UID);
-			imap_delete($this->IMAP,$uid,FT_UID);
-			imap_expunge($this->IMAP);
-			// Close IMAP Connection
-			imap_close($this->IMAP);
+	public function buildConnectionString($host,$port = null,$encryption = null,$isSelfSigned = true){
+		// Setup Connection String
+		if(substr($host, 0, 1) === '{'){ $connection = $host; } else {
+			$connection = '{'.$host.':';
+			if($port != null){ $connection .= $port.'/imap'; } else { $connection .= '143/imap'; }
+			if($encryption != null){ $connection .= '/'.strtolower($encryption); } else { $connection .= '/notls'; }
+			if($isSelfSigned){ $connection .= '/novalidate-cert'; }
+			$connection .= '}';
+		}
+		return $connection;
+	}
+
+	public function saveEml($eml, $IMAP = null){
+		if($IMAP == null){ $IMAP = $this->IMAP; }
+		$connection = imap_mailboxmsginfo($IMAP)->Mailbox;
+		if(imap_append($IMAP, $connection, $eml)){
+			$this->close($IMAP);
 			return true;
-		} else { error_reporting(-1);return false; }
+		} else {
+			$this->close($IMAP);
+			return false;
+		}
+	}
+
+	public function getEml($uid, $IMAP = null){
+		if($IMAP == null){ $IMAP = $this->IMAP; }
+		// Fetch Email
+		$headers = imap_fetchheader($IMAP, $uid, FT_UID);
+		$body = imap_body($IMAP, $uid, FT_UID);
+		// Close IMAP Connection
+		$this->close($IMAP);
+		// Return Blob
+		return $headers."\r\n".$body;
+	}
+
+	public function delete($uid, $IMAP = null){
+		if($IMAP == null){ $IMAP = $this->IMAP; }
+		// Delete Email
+		imap_mail_copy($IMAP,$uid,'Trash',FT_UID);
+		imap_delete($IMAP,$uid,FT_UID);
+		imap_expunge($IMAP);
+		// Close IMAP Connection
+		$this->close($IMAP);
+		return true;
 	}
 
 	public function saveAttachment($file,$destination){
